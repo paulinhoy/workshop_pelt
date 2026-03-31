@@ -29,9 +29,11 @@ ultimo_grafico_base64 = None
 
 # --- CONFIGURAÇÃO INICIAL ---
 
-dotenv_path = Path(__file__).resolve().parent / '.env'
-load_dotenv(dotenv_path)
-api_key = os.getenv("OPENAI_API_KEY")
+# dotenv_path = Path(__file__).resolve().parent / '.env'
+# load_dotenv(dotenv_path)
+# api_key = os.getenv("OPENAI_API_KEY")
+api_key = st.secrets["OPENAI_API_KEY"]
+
   
 # Uso do st.cache_data para evitar recarregar o arquivo em cada nova aba
 @st.cache_data

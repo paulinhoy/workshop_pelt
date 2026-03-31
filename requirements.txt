@@ -6,5 +6,5 @@ seaborn==0.13.2
 langchain==0.3.27
 langchain-openai==0.3.32
 langchain-community==0.3.29
-python-dotenv==1.0.1
 pyarrow==21.0.0
+
