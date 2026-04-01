@@ -29,9 +29,9 @@ ultimo_grafico_base64 = None
 
 # --- CONFIGURAÇÃO INICIAL ---
 
-# dotenv_path = Path(__file__).resolve().parent / '.env'
-# load_dotenv(dotenv_path)
-# api_key = os.getenv("OPENAI_API_KEY")
+#dotenv_path = Path(__file__).resolve().parent / '.env'
+#load_dotenv(dotenv_path)
+#api_key = os.getenv("OPENAI_API_KEY")
 api_key = st.secrets["OPENAI_API_KEY"]
 
   
@@ -305,8 +305,8 @@ with tab_sobre:
     try:
         colunas_apresentacao = ['id_empreendimento', 'nome_empreendimento', 'descr_status_empreendimento', 
                                 'natureza_empreendimento', 'viabilidade', 'rentabilidade',
-                                'capex_declarado', 'opex_declarado', 'tirm', 'ic_1_pond', 'municipio', 'Rodovias',
-                                'setor', 'esfera_acao', 'responsavel_gestao_infraestrutura']
+                                'capex', 'opex', 'tirm', 'ic_1_pond', 'municipio', 'Rodovias',
+                                'setor', 'esfera_acao', 'responsavel_gestao_infraestrutura', 'regiao_geografica_intermediaria' ]
         colunas_disponiveis = [c for c in colunas_apresentacao if c in df.columns]
         df_apresentacao = df[colunas_disponiveis].copy()
         
@@ -318,14 +318,15 @@ with tab_sobre:
             'viabilidade': 'Viabilidade',
             'rentabilidade': 'Rentabilidade',
             'tirm': 'TIRM',
-            'capex_declarado': 'CAPEX (R$)',
-            'opex_declarado': 'OPEX (R$)',
+            'capex': 'CAPEX (R$)',
+            'opex': 'OPEX (R$)',
             'ic_1_pond': 'Nota Ponderada',
             'municipio': 'Município',
             'Rodovias': 'Rodovias',
             'setor': 'Setor',
             'esfera_acao': 'Esfera de Ação',
-            'responsavel_gestao_infraestrutura': 'Responsável Gestão'
+            'responsavel_gestao_infraestrutura': 'Responsável Gestão',
+            'regiao_geografica_intermediaria' : 'Região intermediária'
         })
 
         # Métricas resumo
@@ -392,7 +393,7 @@ with tab_sobre:
                 filtro_resp = 'Todos'
 
         # Filtros Adicionais (Município e Rodovias)
-        col_pesq1, col_pesq2 = st.columns(2)
+        col_pesq1, col_pesq2, col_pesq3 = st.columns(3)
         with col_pesq1:
             if 'Município' in df_apresentacao.columns:
                 municipios_unicos = sorted(df_apresentacao['Município'].explode().dropna().unique().tolist())
@@ -418,6 +419,13 @@ with tab_sobre:
                 filtro_rods = [rodovias_map[lbl] for lbl in filtro_rods_labels]
             else:
                 filtro_rods = []
+    
+            with col_pesq3:
+                if 'Região intermediária' in df_apresentacao.columns:
+                    municipios_unicos = sorted(df_apresentacao['Região intermediária'].explode().dropna().unique().tolist())
+                    filtro_muns = st.multiselect("Pesquisar Região", options=municipios_unicos, help="Comece a digitar para ver as opções...")
+                else:
+                    filtro_muns = []
 
         # Filtros Numéricos
         col_num1, col_num2, col_num3 = st.columns(3)
