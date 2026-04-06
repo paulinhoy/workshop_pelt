@@ -12,7 +12,7 @@ from langchain.tools import Tool
 from langchain.agents import create_tool_calling_agent, AgentExecutor  
 from langchain_openai import ChatOpenAI  
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder 
-from langchain.memory import ConversationTokenBufferMemory 
+from langchain.memory import ConversationBufferWindowMemory 
 from langchain_community.callbacks import get_openai_callback  
   
 from dotenv import load_dotenv  
@@ -29,10 +29,10 @@ ultimo_grafico_base64 = None
 
 # --- CONFIGURAÇÃO INICIAL ---
 
-#dotenv_path = Path(__file__).resolve().parent / '.env'
-#load_dotenv(dotenv_path)
-#api_key = os.getenv("OPENAI_API_KEY")
-api_key = st.secrets["OPENAI_API_KEY"]
+dotenv_path = Path(__file__).resolve().parent / '.env'
+load_dotenv(dotenv_path)
+api_key = os.getenv("OPENAI_API_KEY")
+#api_key = st.secrets["OPENAI_API_KEY"]
 
   
 # Uso do st.cache_data para evitar recarregar o arquivo em cada nova aba
@@ -169,11 +169,11 @@ def inicializar_agente():
             openai_api_key=api_key,  
         )  
         
-        memory = ConversationTokenBufferMemory(  
-            llm=llm,                 
-            max_token_limit=10000,     
+        memory = ConversationBufferWindowMemory(  
+            k=30,     
             memory_key="chat_history",  
-            return_messages=True  
+            return_messages=True,
+            output_key="output"
         )  
         
         agent = create_tool_calling_agent(llm, tools, prompt)  
@@ -232,7 +232,7 @@ with st.sidebar:
         """,
         unsafe_allow_html=True
     )
-    st.image("logos/logo peltmg vermelho.png", width='stretch') # Ajustado de stretch para auto
+    st.image("logos/logo peltmg vermelho.png", use_column_width=True) # Ajustado para use_column_width=True
     st.markdown("---")
     
     st.markdown("### Bem-vindo!")
@@ -264,9 +264,9 @@ with st.sidebar:
     st.markdown("---")
     col_logo1, col_logo2 = st.columns(2, vertical_alignment="center")
     with col_logo1:
-        st.image("logos/logo codemge - branco.png", width='stretch')
+        st.image("logos/logo codemge - branco.png", use_column_width=True)
     with col_logo2:
-        st.image("logos/logo govminas-branco.png", width='stretch')
+        st.image("logos/logo govminas-branco.png", use_column_width=True)
 
 # Área principal
 st.markdown("<h1 style='text-align: center;'>Workshop Comercial</h1>", unsafe_allow_html=True)
@@ -492,7 +492,7 @@ with tab_sobre:
             df_filtrado = df_filtrado[df_filtrado['Nota Ponderada'].isna() | df_filtrado['Nota Ponderada'].between(filtro_nota[0], filtro_nota[1])]
         
         st.markdown(f"**Exibindo {len(df_filtrado)} empreendimentos**")
-        st.dataframe(df_filtrado, width='stretch', height=500)
+        st.dataframe(df_filtrado, use_container_width=True, height=500)
 
     except Exception as e:
         st.error(f"Erro ao montar tabela de apresentação: {e}")
@@ -522,7 +522,7 @@ def exibir_mensagem(content):
         try:  
             base64_data = partes[1].strip()  
             img_data = base64.b64decode(base64_data)  
-            st.image(img_data, width='stretch')  
+            st.image(img_data, use_column_width=True)  
         except Exception as e:  
             st.error(f"Erro ao exibir gráfico: {e}")  
     else:  
