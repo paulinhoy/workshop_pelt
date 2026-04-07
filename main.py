@@ -225,24 +225,34 @@ with st.sidebar:
     st.markdown(
         """
         <style>
+        /* Cor de fundo da sidebar */
         [data-testid="stSidebar"] {
-            background-color: #BAD6D9;
+            background-color: #192E40;
+        }
+        
+        /* Cor da fonte de todos os textos dentro da sidebar */
+        [data-testid="stSidebar"] * {
+            color: #FFFFFF !important;
         }
         </style>
         """,
         unsafe_allow_html=True
     )
-    st.image("logos/logo peltmg vermelho.png", use_column_width=True) # Ajustado para use_column_width=True
-    st.markdown("---")
+    st.image("logos/logo_pelt_branco.png", use_column_width=True) # Ajustado para use_column_width=True
+    st.markdown("""
+    <hr style="height:2px;border:none;color:#E6E6FA;background-color:#E6E6FA;" />
+    """, unsafe_allow_html=True)
     
     st.markdown("### Bem-vindo!")
     st.markdown("Faça perguntas sobre a base de dados de empreendimentos do PELT.")
     
-    st.markdown("---")
+    st.markdown("""
+    <hr style="height:2px;border:none;color:#E6E6FA;background-color:#E6E6FA;" />
+    """, unsafe_allow_html=True)
     
     st.markdown("### Bases de dados")
     st.markdown("""
-    **Dados Consolidados** - Status, viabilidade, rentabilidade
+    **Dados Consolidados** - Status, viabilidade
     - CAPEX, OPEX, receita, TIRM
     - Notas: financeira, socioeconômica, estratégica
     - Rodovias e municípios associados
@@ -251,7 +261,9 @@ with st.sidebar:
     - Presente (2023) e projeção futura
     """)
     
-    st.markdown("---")
+    st.markdown("""
+    <hr style="height:2px;border:none;color:#E6E6FA;background-color:#E6E6FA;" />
+    """, unsafe_allow_html=True)
     
     st.markdown("### Exemplos de perguntas")
     st.markdown("""
@@ -261,7 +273,9 @@ with st.sidebar:
     - *Quais empreendimentos passam pelo município de Uberlândia?*
     """)
 
-    st.markdown("---")
+    st.markdown("""
+    <hr style="height:2px;border:none;color:#E6E6FA;background-color:#E6E6FA;" />
+    """, unsafe_allow_html=True)
     col_logo1, col_logo2 = st.columns(2, vertical_alignment="center")
     with col_logo1:
         st.image("logos/logo codemge - branco.png", use_column_width=True)
@@ -272,6 +286,19 @@ with st.sidebar:
 st.markdown("<h1 style='text-align: center;'>Workshop Comercial</h1>", unsafe_allow_html=True)
 
 tab_sobre, tab_chat = st.tabs(["📋 Sobre o PELT-MG", "💬 ChatPELT"])
+
+# --- Funções auxiliares ---
+
+def formatar_escala(valor):
+    if valor >= 1e9:
+        return f"{valor / 1e9:.1f}bi".replace('.', ',')
+    elif valor >= 1e6:
+        return f"{valor / 1e6:.1f}mi".replace('.', ',')
+    elif valor >= 1e3:
+        return f"{valor / 1e3:.1f}k".replace('.', ',')
+    else:
+        return f"{valor:.0f}"
+
 
 # --- ABA: SOBRE O PELT-MG ---
 with tab_sobre:
@@ -304,9 +331,9 @@ with tab_sobre:
     # Montar tabela de apresentação a partir do df consolidado
     try:
         colunas_apresentacao = ['id_empreendimento', 'nome_empreendimento', 'descr_status_empreendimento', 
-                                'natureza_empreendimento', 'viabilidade', 'rentabilidade',
+                                'natureza_empreendimento', 'setor', 'viabilidade',
                                 'capex', 'opex', 'tirm', 'ic_1_pond', 'municipio', 'Rodovias',
-                                'setor', 'esfera_acao', 'responsavel_gestao_infraestrutura', 'regiao_geografica_intermediaria' ]
+                                'esfera_acao', 'responsavel_gestao_infraestrutura', 'regiao_geografica_intermediaria' ]
         colunas_disponiveis = [c for c in colunas_apresentacao if c in df.columns]
         df_apresentacao = df[colunas_disponiveis].copy()
         
@@ -315,15 +342,14 @@ with tab_sobre:
             'nome_empreendimento': 'Empreendimento',
             'descr_status_empreendimento': 'Status',
             'natureza_empreendimento': 'Natureza',
+            'setor': 'Setor',
             'viabilidade': 'Viabilidade',
-            'rentabilidade': 'Rentabilidade',
             'tirm': 'TIRM',
             'capex': 'CAPEX (R$)',
             'opex': 'OPEX (R$)',
             'ic_1_pond': 'Nota Ponderada',
             'municipio': 'Município',
             'Rodovias': 'Rodovias',
-            'setor': 'Setor',
             'esfera_acao': 'Esfera de Ação',
             'responsavel_gestao_infraestrutura': 'Responsável Gestão',
             'regiao_geografica_intermediaria' : 'Região intermediária'
@@ -435,8 +461,17 @@ with tab_sobre:
             if 'CAPEX (R$)' in df_apresentacao.columns and not df_apresentacao['CAPEX (R$)'].isna().all():
                 min_capex = float(df_apresentacao['CAPEX (R$)'].min())
                 max_capex = float(df_apresentacao['CAPEX (R$)'].max())
+                
                 if min_capex < max_capex:
-                    filtro_capex = st.slider("CAPEX (R$)", min_value=min_capex, max_value=max_capex, value=(min_capex, max_capex), format="R$ %.0f")
+                    # Cria 100 "paradas" entre o valor mínimo e máximo
+                    opcoes_capex = np.linspace(min_capex, max_capex, 100)
+                    
+                    filtro_capex = st.select_slider(
+                        "CAPEX (R$)",
+                        options=opcoes_capex,
+                        value=(opcoes_capex[0], opcoes_capex[-1]),
+                        format_func=formatar_escala 
+                    )
                     
         filtro_opex = None
         with col_num2:
@@ -444,7 +479,13 @@ with tab_sobre:
                 min_opex = float(df_apresentacao['OPEX (R$)'].min())
                 max_opex = float(df_apresentacao['OPEX (R$)'].max())
                 if min_opex < max_opex:
-                    filtro_opex = st.slider("OPEX (R$)", min_value=min_opex, max_value=max_opex, value=(min_opex, max_opex), format="R$ %.0f")
+                    opcoes_opex = np.linspace(min_opex, max_opex, 100)
+
+                    filtro_opex = st.select_slider(
+                        "OPEX (R$)",
+                        options=opcoes_opex,
+                        value=(opcoes_opex[0],opcoes_opex[-1]),
+                        format_func=formatar_escala)
 
         filtro_nota = None
         with col_num3:
@@ -492,7 +533,7 @@ with tab_sobre:
             df_filtrado = df_filtrado[df_filtrado['Nota Ponderada'].isna() | df_filtrado['Nota Ponderada'].between(filtro_nota[0], filtro_nota[1])]
         
         st.markdown(f"**Exibindo {len(df_filtrado)} empreendimentos**")
-        st.dataframe(df_filtrado, use_container_width=True, height=500)
+        st.dataframe(df_filtrado, use_container_width=True, height=500, hide_index=True)
 
     except Exception as e:
         st.error(f"Erro ao montar tabela de apresentação: {e}")
