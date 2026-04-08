@@ -469,7 +469,7 @@ with tab_sobre:
                     filtro_reg = []
 
         # Filtros Numéricos
-        col_num1, col_num2, col_num3 = st.columns(3)
+        col_num1, col_num2, col_num3, col_filtro7 = st.columns(4)
         
         filtro_capex = None
         with col_num1:
@@ -509,6 +509,13 @@ with tab_sobre:
                 max_nota = float(df_apresentacao['Nota Ponderada'].max())
                 if min_nota < max_nota:
                     filtro_nota = st.slider("Nota Ponderada", min_value=min_nota, max_value=max_nota, value=(min_nota, max_nota), format="%.2f")
+
+        with col_filtro7:
+            if 'Intervenção Principal' in df_apresentacao.columns:
+                int_opcoes = sorted(df_apresentacao['Intervenção Principal'].dropna().unique().tolist())
+                filtro_int = st.multiselect("Intervenção Principal", int_opcoes)
+            else:
+                filtro_int = []
 
         st.markdown("---")
         filtro_texto_nome = st.text_input(
