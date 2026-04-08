@@ -76,6 +76,12 @@ def padronizar_lista_rodovias(lista_rodovias):
         lista_limpa.append(rodovia_padronizada)
     return list(set(lista_limpa))
 
+def converter_para_lista(texto):
+    if pd.isna(texto) or texto == '{}':
+        return []
+    # Busca tudo o que está dentro de aspas duplas " "
+    return re.findall(r'"([^"]*)"', texto)
+
 df_rodovias['Rodovias'] = df_rodovias['Rodovias'].apply(padronizar_lista_rodovias)
 df_rodovias = df_rodovias[['id_empreendimento', 'Rodovias']]
 
@@ -106,7 +112,7 @@ df_consolidado.rename(columns={'capex_empreendimento_atualizado': 'capex', 'opex
 df_consolidado = pd.merge(df_consolidado, df_region, on='id_empreendimento', how='left')
 df_consolidado= pd.merge(df_consolidado, df_extensao, on='id_empreendimento', how='left')
 df_consolidado=pd.merge(df_consolidado, df_gestao_carteiras, on='id_empreendimento', how='left')
-print('Nome coluna df_consolidado', df_consolidado.columns)
+df_consolidado['tipos_infraestruturas'] = df_consolidado['tipos_infraestruturas'].apply(converter_para_lista)
 
 # Verificação
 nulos_nome = df_consolidado['nome_empreendimento'].isna().sum()

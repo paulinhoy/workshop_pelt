@@ -335,7 +335,7 @@ with tab_sobre:
                                 'esfera_acao', 'descr_status_empreendimento', 'extensao_km',
                                 'tipos_infraestruturas', 'ic_1_pond', 'impacto_avaliado_1_pond_cenario',
                                 'capex', 'opex', 'receita', 'tirm', 'viabilidade', 'responsavel_gestao_infraestrutura', 
-                                'municipio', 'natureza_empreendimento', 'Rodovias', 'regiao_geografica_intermediaria']
+                                'municipio', 'natureza_empreendimento', 'Rodovias', 'regiao_geografica_intermediaria', 'grupo_modelagem']
 
         colunas_disponiveis = [c for c in colunas_apresentacao if c in df.columns]
         df_apresentacao = df[colunas_disponiveis].copy()
@@ -360,7 +360,8 @@ with tab_sobre:
             'Rodovias': 'Rodovias',
             'esfera_acao': 'Esfera de Ação',
             'responsavel_gestao_infraestrutura': 'Responsável Gestão',
-            'regiao_geografica_intermediaria' : 'Região intermediária'
+            'regiao_geografica_intermediaria' : 'Região intermediária',
+            'grupo_modelagem': 'Grupo Modelagem'
         })
 
         # Métricas resumo
@@ -462,9 +463,9 @@ with tab_sobre:
             with col_pesq3:
                 if 'Região intermediária' in df_apresentacao.columns:
                     municipios_unicos = sorted(df_apresentacao['Região intermediária'].explode().dropna().unique().tolist())
-                    filtro_muns = st.multiselect("Pesquisar Região", options=municipios_unicos, help="Comece a digitar para ver as opções...")
+                    filtro_reg = st.multiselect("Pesquisar Região", options=municipios_unicos, help="Comece a digitar para ver as opções...")
                 else:
-                    filtro_muns = []
+                    filtro_reg = []
 
         # Filtros Numéricos
         col_num1, col_num2, col_num3 = st.columns(3)
@@ -508,9 +509,14 @@ with tab_sobre:
                 if min_nota < max_nota:
                     filtro_nota = st.slider("Nota Ponderada", min_value=min_nota, max_value=max_nota, value=(min_nota, max_nota), format="%.2f")
 
+        st.markdown("---")
+        filtro_texto_nome = st.text_input(
+            "Pesquisar por Nome do Empreendimento", 
+            placeholder="Digite parte do nome para buscar..."
+        )
+
         # Aplicação dos Filtros
         df_filtrado = df_apresentacao.copy()
-        
 
         # Filtros Categóricos 
         if filtro_viab and 'Viabilidade' in df_filtrado.columns:
