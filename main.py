@@ -331,7 +331,7 @@ with tab_sobre:
     # Montar tabela de apresentação a partir do df consolidado
     try:        
         # Colunas sugerida pela Maíra 
-        colunas_apresentacao = ['setor', 'id_empreendimento', 'nome_empreendimento', 'origem_ajustada',
+        colunas_apresentacao = ['link_formulario','setor', 'id_empreendimento', 'nome_empreendimento', 'origem_ajustada',
                                 'esfera_acao', 'descr_status_empreendimento', 'extensao_km',
                                 'tipos_infraestruturas', 'ic_1_pond', 'impacto_avaliado_1_pond_cenario',
                                 'capex', 'opex', 'receita', 'tirm', 'viabilidade', 'responsavel_gestao_infraestrutura', 
@@ -478,7 +478,7 @@ with tab_sobre:
                 
                 if min_capex < max_capex:
                     # Cria 100 "paradas" entre o valor mínimo e máximo
-                    opcoes_capex = np.linspace(min_capex, max_capex, 100)
+                    opcoes_capex = np.linspace(min_capex, max_capex, 200)
                     
                     filtro_capex = st.select_slider(
                         "CAPEX (R$)",
@@ -559,7 +559,35 @@ with tab_sobre:
             df_filtrado = df_filtrado[df_filtrado['Nota Ponderada'].isna() | df_filtrado['Nota Ponderada'].between(filtro_nota[0], filtro_nota[1])]
         
         st.markdown(f"**Exibindo {len(df_filtrado)} empreendimentos**")
-        st.dataframe(df_filtrado, use_container_width=True, height=500, hide_index=True)
+        #st.dataframe(df_filtrado, use_container_width=True, height=500, hide_index=True)
+
+        st.dataframe(
+            df_filtrado, 
+            use_container_width=True, 
+            height=500, 
+            hide_index=True,
+            column_config={
+                # Configura a coluna do link para ser um botão clicável
+                "link_formulario": st.column_config.LinkColumn(
+                    "Ação", 
+                    display_text="🔗 Avaliar", 
+                    help="Clique para abrir o formulário"
+                ),
+                # Formatação unidades
+                "CAPEX (R$)": st.column_config.NumberColumn(
+                    format="%.0f" 
+                ),
+                "OPEX (R$)": st.column_config.NumberColumn(
+                    format="%.0f"
+                ),
+                "Extensao (Km)": st.column_config.NumberColumn(
+                    format="%.0f"
+                ),
+                "Receita": st.column_config.NumberColumn(
+                    format="%.0f"
+                )
+            }
+        )
 
     except Exception as e:
         st.error(f"Erro ao montar tabela de apresentação: {e}")
