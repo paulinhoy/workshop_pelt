@@ -89,7 +89,7 @@ df_rodovias = df_rodovias[['id_empreendimento', 'Rodovias']]
 df_municipio = pd.merge(df_municipio, df_rodovias, on='id_empreendimento', how='outer')
 
 # --- Selecionar colunas ---
-df_empreendimento_cols = df_empreendimento[['id_empreendimento', 'origem_ajustada', 'tipos_infraestruturas', 'nome_empreendimento']]
+df_empreendimento_cols = df_empreendimento[['id_empreendimento', 'origem_ajustada', 'tipos_infraestruturas','intervencao_principal', 'nome_empreendimento']]
 
 df_impacto_cols = df_impacto[['id_empreendimento', 'setor','descr_status_empreendimento', 'natureza_empreendimento',
                                'esfera_acao', 'grupo_modelagem', 'responsavel_gestao_infraestrutura', 

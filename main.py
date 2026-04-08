@@ -332,7 +332,7 @@ with tab_sobre:
     try:        
         # Colunas sugerida pela Maíra 
         colunas_apresentacao = ['link_formulario','setor', 'id_empreendimento', 'nome_empreendimento', 'origem_ajustada',
-                                'esfera_acao', 'descr_status_empreendimento', 'extensao_km',
+                                'esfera_acao', 'descr_status_empreendimento', 'extensao_km', 'intervencao_principal',
                                 'tipos_infraestruturas', 'ic_1_pond', 'impacto_avaliado_1_pond_cenario',
                                 'capex', 'opex', 'receita', 'tirm', 'viabilidade', 'responsavel_gestao_infraestrutura', 
                                 'municipio', 'natureza_empreendimento', 'Rodovias', 'regiao_geografica_intermediaria', 'grupo_modelagem']
@@ -347,6 +347,7 @@ with tab_sobre:
             'impacto_avaliado_1_pond_cenario': 'Impacto',
             'tipos_infraestruturas': 'Tipo Infraestrutura',
             'extensao_km': 'Extensao (Km)',
+            'intervencao_principal': 'Intervenção Principal',
             'receita': 'Receita',
             'descr_status_empreendimento': 'Status',
             'natureza_empreendimento': 'Natureza',
@@ -389,11 +390,11 @@ with tab_sobre:
         # Filtros Categóricos
         col_filtro1, col_filtro2, col_filtro3 = st.columns(3)
         with col_filtro1:
-            if 'Viabilidade' in df_apresentacao.columns:
-                viab_opcoes = sorted(df_apresentacao['Viabilidade'].dropna().unique().tolist())
-                filtro_viab = st.multiselect("Viabilidade", viab_opcoes)
+            if 'Setor' in df_apresentacao.columns:
+                setor_opcoes = sorted(df_apresentacao['Setor'].dropna().unique().tolist())
+                filtro_setor = st.multiselect("Setor", setor_opcoes)
             else:
-                filtro_viab = []
+                filtro_setor = []
         
         with col_filtro2:
             if 'Status' in df_apresentacao.columns:
@@ -403,34 +404,34 @@ with tab_sobre:
                 filtro_status = []
         
         with col_filtro3:
-            if 'Natureza' in df_apresentacao.columns:
-                nat_opcoes = sorted(df_apresentacao['Natureza'].dropna().unique().tolist())
-                filtro_nat = st.multiselect("Natureza", nat_opcoes)
+            if 'Origem' in df_apresentacao.columns:
+                origem_opcoes = sorted(df_apresentacao['Origem'].dropna().unique().tolist())
+                filtro_origem = st.multiselect("Origem", origem_opcoes)
             else:
-                filtro_nat = []
+                filtro_origem = []
         
         col_filtro4, col_filtro5, col_filtro6 = st.columns(3)
         
         with col_filtro4:
-            if 'Setor' in df_apresentacao.columns:
-                setor_opcoes = sorted(df_apresentacao['Setor'].dropna().unique().tolist())
-                filtro_setor = st.multiselect("Setor", setor_opcoes)
-            else:
-                filtro_setor = []
-        
-        with col_filtro5:
             if 'Esfera de Ação' in df_apresentacao.columns:
                 esfera_opcoes = sorted(df_apresentacao['Esfera de Ação'].dropna().unique().tolist())
                 filtro_esfera = st.multiselect("Esfera de Ação", esfera_opcoes)
             else:
                 filtro_esfera = []
         
-        with col_filtro6:
-            if 'Responsável Gestão' in df_apresentacao.columns:
-                resp_opcoes = sorted(df_apresentacao['Responsável Gestão'].dropna().unique().tolist())
-                filtro_resp = st.multiselect("Responsável Gestão", resp_opcoes)
+        with col_filtro5:
+            if 'Impacto' in df_apresentacao.columns:
+                impacto_opcoes = sorted(df_apresentacao['Impacto'].dropna().unique().tolist())
+                filtro_impacto = st.multiselect("Impacto", impacto_opcoes)
             else:
-                filtro_resp = []
+                filtro_esfera = []
+        
+        with col_filtro6:
+            if 'Viabilidade' in df_apresentacao.columns:
+                viab_opcoes = sorted(df_apresentacao['Viabilidade'].dropna().unique().tolist())
+                filtro_viab = st.multiselect("Viabilidade", viab_opcoes)
+            else:
+                filtro_viab = []
 
         # Filtros Adicionais (Município e Rodovias)
         col_pesq1, col_pesq2, col_pesq3 = st.columns(3)
@@ -525,8 +526,8 @@ with tab_sobre:
         if filtro_status and 'Status' in df_filtrado.columns:
             df_filtrado = df_filtrado[df_filtrado['Status'].isin(filtro_status)]
             
-        if filtro_nat and 'Natureza' in df_filtrado.columns:
-            df_filtrado = df_filtrado[df_filtrado['Natureza'].isin(filtro_nat)]
+        if filtro_origem and 'Origem' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['Natureza'].isin(filtro_origem)]
             
         if filtro_setor and 'Setor' in df_filtrado.columns:
             df_filtrado = df_filtrado[df_filtrado['Setor'].isin(filtro_setor)]
@@ -534,8 +535,8 @@ with tab_sobre:
         if filtro_esfera and 'Esfera de Ação' in df_filtrado.columns:
             df_filtrado = df_filtrado[df_filtrado['Esfera de Ação'].isin(filtro_esfera)]
             
-        if filtro_resp and 'Responsável Gestão' in df_filtrado.columns:
-            df_filtrado = df_filtrado[df_filtrado['Responsável Gestão'].isin(filtro_resp)]
+        if filtro_impacto and 'Impacto' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['Responsável Gestão'].isin(filtro_impacto)]
             
         if filtro_muns and 'Município' in df_filtrado.columns:
             def has_mun(val):
