@@ -329,17 +329,25 @@ with tab_sobre:
     """)
 
     # Montar tabela de apresentação a partir do df consolidado
-    try:
-        colunas_apresentacao = ['id_empreendimento', 'nome_empreendimento', 'descr_status_empreendimento', 
-                                'natureza_empreendimento', 'setor', 'viabilidade',
-                                'capex', 'opex', 'tirm', 'ic_1_pond', 'municipio', 'Rodovias',
-                                'esfera_acao', 'responsavel_gestao_infraestrutura', 'regiao_geografica_intermediaria' ]
+    try:        
+        # Colunas sugerida pela Maíra 
+        colunas_apresentacao = ['setor', 'id_empreendimento', 'nome_empreendimento', 'origem_ajustada',
+                                'esfera_acao', 'descr_status_empreendimento', 'extensao_km',
+                                'tipos_infraestruturas', 'ic_1_pond', 'impacto_avaliado_1_pond_cenario',
+                                'capex', 'opex', 'receita', 'tirm', 'viabilidade', 'responsavel_gestao_infraestrutura', 
+                                'municipio', 'natureza_empreendimento', 'Rodovias', 'regiao_geografica_intermediaria']
+
         colunas_disponiveis = [c for c in colunas_apresentacao if c in df.columns]
         df_apresentacao = df[colunas_disponiveis].copy()
         
         df_apresentacao = df_apresentacao.rename(columns={
             'id_empreendimento': 'ID',
             'nome_empreendimento': 'Empreendimento',
+            'origem_ajustada': 'Origem',
+            'impacto_avaliado_1_pond_cenario': 'Impacto',
+            'tipos_infraestruturas': 'Tipo Infraestrutura',
+            'extensao_km': 'Extensao (Km)',
+            'receita': 'Receita',
             'descr_status_empreendimento': 'Status',
             'natureza_empreendimento': 'Natureza',
             'setor': 'Setor',
@@ -381,42 +389,47 @@ with tab_sobre:
         col_filtro1, col_filtro2, col_filtro3 = st.columns(3)
         with col_filtro1:
             if 'Viabilidade' in df_apresentacao.columns:
-                viab_opcoes = ['Todos'] + sorted(df_apresentacao['Viabilidade'].dropna().unique().tolist())
+                viab_opcoes = sorted(df_apresentacao['Viabilidade'].dropna().unique().tolist())
+                filtro_viab = st.multiselect("Viabilidade", viab_opcoes)
             else:
-                viab_opcoes = ['Todos']
-            filtro_viab = st.selectbox("Viabilidade", viab_opcoes)
+                filtro_viab = []
+        
         with col_filtro2:
             if 'Status' in df_apresentacao.columns:
-                status_opcoes = ['Todos'] + sorted(df_apresentacao['Status'].dropna().unique().tolist())
+                status_opcoes = sorted(df_apresentacao['Status'].dropna().unique().tolist())
+                filtro_status = st.multiselect("Status", status_opcoes)
             else:
-                status_opcoes = ['Todos']
-            filtro_status = st.selectbox("Status", status_opcoes)
+                filtro_status = []
+        
         with col_filtro3:
             if 'Natureza' in df_apresentacao.columns:
-                nat_opcoes = ['Todos'] + sorted(df_apresentacao['Natureza'].dropna().unique().tolist())
+                nat_opcoes = sorted(df_apresentacao['Natureza'].dropna().unique().tolist())
+                filtro_nat = st.multiselect("Natureza", nat_opcoes)
             else:
-                nat_opcoes = ['Todos']
-            filtro_nat = st.selectbox("Natureza", nat_opcoes)
-
+                filtro_nat = []
+        
         col_filtro4, col_filtro5, col_filtro6 = st.columns(3)
+        
         with col_filtro4:
             if 'Setor' in df_apresentacao.columns:
-                setor_opcoes = ['Todos'] + sorted(df_apresentacao['Setor'].dropna().unique().tolist())
-                filtro_setor = st.selectbox("Setor", setor_opcoes)
+                setor_opcoes = sorted(df_apresentacao['Setor'].dropna().unique().tolist())
+                filtro_setor = st.multiselect("Setor", setor_opcoes)
             else:
-                filtro_setor = 'Todos'
+                filtro_setor = []
+        
         with col_filtro5:
             if 'Esfera de Ação' in df_apresentacao.columns:
-                esfera_opcoes = ['Todos'] + sorted(df_apresentacao['Esfera de Ação'].dropna().unique().tolist())
-                filtro_esfera = st.selectbox("Esfera de Ação", esfera_opcoes)
+                esfera_opcoes = sorted(df_apresentacao['Esfera de Ação'].dropna().unique().tolist())
+                filtro_esfera = st.multiselect("Esfera de Ação", esfera_opcoes)
             else:
-                filtro_esfera = 'Todos'
+                filtro_esfera = []
+        
         with col_filtro6:
             if 'Responsável Gestão' in df_apresentacao.columns:
-                resp_opcoes = ['Todos'] + sorted(df_apresentacao['Responsável Gestão'].dropna().unique().tolist())
-                filtro_resp = st.selectbox("Responsável Gestão", resp_opcoes)
+                resp_opcoes = sorted(df_apresentacao['Responsável Gestão'].dropna().unique().tolist())
+                filtro_resp = st.multiselect("Responsável Gestão", resp_opcoes)
             else:
-                filtro_resp = 'Todos'
+                filtro_resp = []
 
         # Filtros Adicionais (Município e Rodovias)
         col_pesq1, col_pesq2, col_pesq3 = st.columns(3)
@@ -498,18 +511,25 @@ with tab_sobre:
         # Aplicação dos Filtros
         df_filtrado = df_apresentacao.copy()
         
-        if filtro_viab != 'Todos' and 'Viabilidade' in df_filtrado.columns:
-            df_filtrado = df_filtrado[df_filtrado['Viabilidade'] == filtro_viab]
-        if filtro_status != 'Todos' and 'Status' in df_filtrado.columns:
-            df_filtrado = df_filtrado[df_filtrado['Status'] == filtro_status]
-        if filtro_nat != 'Todos' and 'Natureza' in df_filtrado.columns:
-            df_filtrado = df_filtrado[df_filtrado['Natureza'] == filtro_nat]
-        if filtro_setor != 'Todos' and 'Setor' in df_filtrado.columns:
-            df_filtrado = df_filtrado[df_filtrado['Setor'] == filtro_setor]
-        if filtro_esfera != 'Todos' and 'Esfera de Ação' in df_filtrado.columns:
-            df_filtrado = df_filtrado[df_filtrado['Esfera de Ação'] == filtro_esfera]
-        if filtro_resp != 'Todos' and 'Responsável Gestão' in df_filtrado.columns:
-            df_filtrado = df_filtrado[df_filtrado['Responsável Gestão'] == filtro_resp]
+
+        # Filtros Categóricos 
+        if filtro_viab and 'Viabilidade' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['Viabilidade'].isin(filtro_viab)]
+            
+        if filtro_status and 'Status' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['Status'].isin(filtro_status)]
+            
+        if filtro_nat and 'Natureza' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['Natureza'].isin(filtro_nat)]
+            
+        if filtro_setor and 'Setor' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['Setor'].isin(filtro_setor)]
+            
+        if filtro_esfera and 'Esfera de Ação' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['Esfera de Ação'].isin(filtro_esfera)]
+            
+        if filtro_resp and 'Responsável Gestão' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['Responsável Gestão'].isin(filtro_resp)]
             
         if filtro_muns and 'Município' in df_filtrado.columns:
             def has_mun(val):
