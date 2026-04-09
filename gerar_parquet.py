@@ -102,7 +102,7 @@ df_consolidado = pd.merge(df_empreendimento_cols, df_impacto_cols, on='id_empree
 df_consolidado = pd.merge(df_consolidado, df_municipio, on='id_empreendimento', how='left')
 
 # Juntar com link para cada empreendimento
-df_consolidado = pd.merge(df_consolidado, df_links, on ='id_empreendimento', how='left')
+df_consolidado = pd.merge(df_consolidado, df_links, on ='id_empreendimento', how='inner')
 
 # Consolidando dados de capex, opex, carteira_classificada, regiões intermediarias e alteracao nomes da colunas
 df_consolidado = pd.merge(df_consolidado, df_economico, on='id_empreendimento',how='left')

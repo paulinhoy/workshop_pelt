@@ -123,10 +123,10 @@ ultimo_grafico_base64 = None
 
 # --- CONFIGURAÇÃO INICIAL ---
 
-dotenv_path = Path(__file__).resolve().parent / '.env'
-load_dotenv(dotenv_path)
-api_key = os.getenv("OPENAI_API_KEY")
-#api_key = st.secrets["OPENAI_API_KEY"]
+#dotenv_path = Path(__file__).resolve().parent / '.env'
+#load_dotenv(dotenv_path)
+#api_key = os.getenv("OPENAI_API_KEY")
+api_key = st.secrets["OPENAI_API_KEY"]
 
   
 # Uso do st.cache_data para evitar recarregar o arquivo em cada nova aba
@@ -344,15 +344,18 @@ with st.sidebar:
     <hr style="height:2px;border:none;color:#E6E6FA;background-color:#E6E6FA;" />
     """, unsafe_allow_html=True)
     
-    st.markdown("### Bases de dados")
+    st.markdown("### Bases de Dados")
     st.markdown("""
-    **Dados Consolidados** - Status, viabilidade
-    - CAPEX, OPEX, receita, TIRM
-    - Notas: financeira, socioeconômica, estratégica
-    - Rodovias e municípios associados
+    **Dados Consolidados**
+    - **Projetos:** IDs, nomes, links de avaliação e intervenção principal.
+    - **Contexto:** Setor, esfera de ação, status e origem ajustada.
+    - **Financeiro:** CAPEX, OPEX, receita, TIRM e viabilidade declarada.
+    - **Impacto:** Impacto avaliado e nota ponderada (IC 1 Ponderado).
+    - **Território:** Extensão (km), rodovias, municípios e regiões associadas.
     
-    **Demanda de Transporte** - Toneladas, TKU e veículos
-    - Presente (2023) e projeção futura
+    **Demanda de Transporte**
+    - Fluxos de carga (toneladas e TKU) e tráfego de veículos.
+    - Dados do cenário presente (2023) e projeções futuras.
     """)
     
     st.markdown("""
@@ -462,13 +465,13 @@ with tab_sobre:
         # Métricas resumo
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Total de empreendimentos", f"{len(df_apresentacao):,}".replace(",", "."))
+            st.metric("Empreendimentos", f"{len(df_apresentacao):,}".replace(",", "."))
         with col2:
-            if 'Status' in df_apresentacao.columns:
-                em_execucao = df_apresentacao['Status'].astype(str).str.contains('execução', case=False, na=False).sum()
+            if 'Impacto' in df_apresentacao.columns:
+                alto_impacto = df_apresentacao['Impacto'].astype(str).str.contains('Alto', case=False, na=False).sum()
             else:
-                em_execucao = 0
-            st.metric("Em execução", f"{em_execucao:,}".replace(",", "."))
+                alto_impacto = 0
+            st.metric("Alto impacto", f"{alto_impacto:,}".replace(",", "."))
         with col3:
             if 'Viabilidade' in df_apresentacao.columns:
                 alta_viab = df_apresentacao['Viabilidade'].astype(str).str.contains('Alta', case=False, na=False).sum()
