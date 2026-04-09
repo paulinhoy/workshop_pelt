@@ -424,7 +424,7 @@ with tab_sobre:
                 impacto_opcoes = sorted(df_apresentacao['Impacto'].dropna().unique().tolist())
                 filtro_impacto = st.multiselect("Impacto", impacto_opcoes)
             else:
-                filtro_esfera = []
+                filtro_impacto = []
         
         with col_filtro6:
             if 'Viabilidade' in df_apresentacao.columns:
@@ -540,7 +540,7 @@ with tab_sobre:
             df_filtrado = df_filtrado[df_filtrado['Status'].isin(filtro_status)]
             
         if filtro_origem and 'Origem' in df_filtrado.columns:
-            df_filtrado = df_filtrado[df_filtrado['Natureza'].isin(filtro_origem)]
+            df_filtrado = df_filtrado[df_filtrado['Origem'].isin(filtro_origem)]
             
         if filtro_setor and 'Setor' in df_filtrado.columns:
             df_filtrado = df_filtrado[df_filtrado['Setor'].isin(filtro_setor)]
@@ -549,8 +549,11 @@ with tab_sobre:
             df_filtrado = df_filtrado[df_filtrado['Esfera de Ação'].isin(filtro_esfera)]
             
         if filtro_impacto and 'Impacto' in df_filtrado.columns:
-            df_filtrado = df_filtrado[df_filtrado['Responsável Gestão'].isin(filtro_impacto)]
+            df_filtrado = df_filtrado[df_filtrado['Impacto'].isin(filtro_impacto)]
             
+        if filtro_int and 'Intervenção Principal' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['Intervenção Principal'].isin(filtro_int)]
+
         if filtro_muns and 'Município' in df_filtrado.columns:
             def has_mun(val):
                 if isinstance(val, (list, np.ndarray)):
