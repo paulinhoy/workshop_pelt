@@ -388,25 +388,42 @@ with tab_sobre:
         st.markdown("---")
 
         # Filtros Categóricos
+        def limpar_filtros():
+            chaves = [
+                'ms_setor', 'ms_status', 'ms_origem', 'ms_esfera', 'ms_impacto', 
+                'ms_viab', 'ms_muns', 'ms_rods', 'ms_reg', 'sl_capex', 'sl_opex', 
+                'sl_nota', 'ms_int', 'ms_nome'
+            ]
+            for chave in chaves:
+                if chave in st.session_state:
+                    if chave.startswith('ms_'):
+                        st.session_state[chave] = []
+                    else:
+                        del st.session_state[chave]
+
+        col_btn_limpar, _ = st.columns([1, 4])
+        with col_btn_limpar:
+            st.button("🗑️ Limpar Filtros", on_click=limpar_filtros, use_container_width=True)
+
         col_filtro1, col_filtro2, col_filtro3 = st.columns(3)
         with col_filtro1:
             if 'Setor' in df_apresentacao.columns:
                 setor_opcoes = sorted(df_apresentacao['Setor'].dropna().unique().tolist())
-                filtro_setor = st.multiselect("Setor", setor_opcoes)
+                filtro_setor = st.multiselect("Setor", setor_opcoes, key="ms_setor")
             else:
                 filtro_setor = []
         
         with col_filtro2:
             if 'Status' in df_apresentacao.columns:
                 status_opcoes = sorted(df_apresentacao['Status'].dropna().unique().tolist())
-                filtro_status = st.multiselect("Status", status_opcoes)
+                filtro_status = st.multiselect("Status", status_opcoes, key="ms_status")
             else:
                 filtro_status = []
         
         with col_filtro3:
             if 'Origem' in df_apresentacao.columns:
                 origem_opcoes = sorted(df_apresentacao['Origem'].dropna().unique().tolist())
-                filtro_origem = st.multiselect("Origem", origem_opcoes)
+                filtro_origem = st.multiselect("Origem", origem_opcoes, key="ms_origem")
             else:
                 filtro_origem = []
         
@@ -415,21 +432,21 @@ with tab_sobre:
         with col_filtro4:
             if 'Esfera de Ação' in df_apresentacao.columns:
                 esfera_opcoes = sorted(df_apresentacao['Esfera de Ação'].dropna().unique().tolist())
-                filtro_esfera = st.multiselect("Esfera de Ação", esfera_opcoes)
+                filtro_esfera = st.multiselect("Esfera de Ação", esfera_opcoes, key="ms_esfera")
             else:
                 filtro_esfera = []
         
         with col_filtro5:
             if 'Impacto' in df_apresentacao.columns:
                 impacto_opcoes = sorted(df_apresentacao['Impacto'].dropna().unique().tolist())
-                filtro_impacto = st.multiselect("Impacto", impacto_opcoes)
+                filtro_impacto = st.multiselect("Impacto", impacto_opcoes, key="ms_impacto")
             else:
                 filtro_impacto = []
         
         with col_filtro6:
             if 'Viabilidade' in df_apresentacao.columns:
                 viab_opcoes = sorted(df_apresentacao['Viabilidade'].dropna().unique().tolist())
-                filtro_viab = st.multiselect("Viabilidade", viab_opcoes)
+                filtro_viab = st.multiselect("Viabilidade", viab_opcoes, key="ms_viab")
             else:
                 filtro_viab = []
 
@@ -438,7 +455,7 @@ with tab_sobre:
         with col_pesq1:
             if 'Município' in df_apresentacao.columns:
                 municipios_unicos = sorted(df_apresentacao['Município'].explode().dropna().unique().tolist())
-                filtro_muns = st.multiselect("Pesquisar Município", options=municipios_unicos, help="Comece a digitar para ver as opções...")
+                filtro_muns = st.multiselect("Pesquisar Município", options=municipios_unicos, help="Comece a digitar para ver as opções...", key="ms_muns")
             else:
                 filtro_muns = []
                 
@@ -456,17 +473,17 @@ with tab_sobre:
                     else:
                         rodovias_map[r_str] = r
                 opcoes_rodovias = sorted(list(rodovias_map.keys()))
-                filtro_rods_labels = st.multiselect("Pesquisar Rodovias", options=opcoes_rodovias, help="Ex: digite 'BR-381', 'br381' ou 'br 381'")
+                filtro_rods_labels = st.multiselect("Pesquisar Rodovias", options=opcoes_rodovias, help="Ex: digite 'BR-381', 'br381' ou 'br 381'", key="ms_rods")
                 filtro_rods = [rodovias_map[lbl] for lbl in filtro_rods_labels]
             else:
                 filtro_rods = []
     
-            with col_pesq3:
-                if 'Região intermediária' in df_apresentacao.columns:
-                    municipios_unicos = sorted(df_apresentacao['Região intermediária'].explode().dropna().unique().tolist())
-                    filtro_reg = st.multiselect("Pesquisar Região", options=municipios_unicos, help="Comece a digitar para ver as opções...")
-                else:
-                    filtro_reg = []
+        with col_pesq3:
+            if 'Região intermediária' in df_apresentacao.columns:
+                regioes_unicas = sorted(df_apresentacao['Região intermediária'].explode().dropna().unique().tolist())
+                filtro_reg = st.multiselect("Pesquisar Região", options=regioes_unicas, help="Comece a digitar para ver as opções...", key="ms_reg")
+            else:
+                filtro_reg = []
 
         # Filtros Numéricos
         col_num1, col_num2, col_num3, col_filtro7 = st.columns(4)
@@ -485,7 +502,8 @@ with tab_sobre:
                         "CAPEX (R$)",
                         options=opcoes_capex,
                         value=(opcoes_capex[0], opcoes_capex[-1]),
-                        format_func=formatar_escala 
+                        format_func=formatar_escala,
+                        key="sl_capex"
                     )
                     
         filtro_opex = None
@@ -500,7 +518,8 @@ with tab_sobre:
                         "OPEX (R$)",
                         options=opcoes_opex,
                         value=(opcoes_opex[0],opcoes_opex[-1]),
-                        format_func=formatar_escala)
+                        format_func=formatar_escala,
+                        key="sl_opex")
 
         filtro_nota = None
         with col_num3:
@@ -508,12 +527,12 @@ with tab_sobre:
                 min_nota = float(df_apresentacao['Nota Ponderada'].min())
                 max_nota = float(df_apresentacao['Nota Ponderada'].max())
                 if min_nota < max_nota:
-                    filtro_nota = st.slider("Nota Ponderada", min_value=min_nota, max_value=max_nota, value=(min_nota, max_nota), format="%.2f")
+                    filtro_nota = st.slider("Nota Ponderada", min_value=min_nota, max_value=max_nota, value=(min_nota, max_nota), format="%.2f", key="sl_nota")
 
         with col_filtro7:
             if 'Intervenção Principal' in df_apresentacao.columns:
                 int_opcoes = sorted(df_apresentacao['Intervenção Principal'].dropna().unique().tolist())
-                filtro_int = st.multiselect("Intervenção Principal", int_opcoes)
+                filtro_int = st.multiselect("Intervenção Principal", int_opcoes, key="ms_int")
             else:
                 filtro_int = []
 
@@ -526,7 +545,8 @@ with tab_sobre:
         filtro_texto_nome = st.multiselect(
             "Pesquisar por Nome do Empreendimento", 
             options=opcoes_empreendimentos,
-            placeholder="Digite parte do nome para buscar..."
+            placeholder="Digite parte do nome para buscar...",
+            key="ms_nome"
         )
 
         # Aplicação dos Filtros
