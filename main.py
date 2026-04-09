@@ -518,8 +518,14 @@ with tab_sobre:
                 filtro_int = []
 
         st.markdown("---")
-        filtro_texto_nome = st.text_input(
+        if 'Empreendimento' in df_apresentacao.columns:
+            opcoes_empreendimentos = sorted(df_apresentacao['Empreendimento'].dropna().unique().tolist())
+        else:
+            opcoes_empreendimentos = []
+
+        filtro_texto_nome = st.multiselect(
             "Pesquisar por Nome do Empreendimento", 
+            options=opcoes_empreendimentos,
             placeholder="Digite parte do nome para buscar..."
         )
 
@@ -565,6 +571,9 @@ with tab_sobre:
             df_filtrado = df_filtrado[df_filtrado['OPEX (R$)'].isna() | df_filtrado['OPEX (R$)'].between(filtro_opex[0], filtro_opex[1])]
         if filtro_nota:
             df_filtrado = df_filtrado[df_filtrado['Nota Ponderada'].isna() | df_filtrado['Nota Ponderada'].between(filtro_nota[0], filtro_nota[1])]
+            
+        if filtro_texto_nome and 'Empreendimento' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['Empreendimento'].isin(filtro_texto_nome)]
         
         st.markdown(f"**Exibindo {len(df_filtrado)} empreendimentos**")
         #st.dataframe(df_filtrado, use_container_width=True, height=500, hide_index=True)
