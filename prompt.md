@@ -21,29 +21,31 @@ Contém informações cadastrais, financeiras, de viabilidade, impacto e localiz
 | Coluna | Tipo | Descrição |
 |---|---|---|
 | `id_empreendimento` | numérico | Identificador único do empreendimento (chave de junção) |
-| `nome_empreendimento` | texto | Nome do empreendimento |
+| `nome_empreendimento` | texto | Nome do empreendimento (Pode ser chamado de projeto pelo usuário) |
 | `setor` | texto/categórica | Setor do empreendimento (ex.: "Rodoviário", "Ferroviário", "Aeroviário", etc.) |
 | `descr_status_empreendimento` | texto/categórica | Status atual (ex.: "Contratado - em execução", "Planejado", etc.) |
 | `natureza_empreendimento` | texto/categórica | Natureza (ex.: "Implantação", "Adequação", "Recuperação") |
 | `esfera_acao` | texto/categórica | Esfera de ação (ex.: "Federal", "Estadual", "Municipal") |
 | `grupo_modelagem` | texto/categórica | Grupo de modelagem (ex.: "Caso geral - infraestruturas lineares", "Conservação rodoviária", etc.) |
+| `origem_ajustada` | texto/categórica | Origem do empreendimento (ex.: "PELT", "CODEMGE", etc.) |
 | `responsavel_gestao_infraestrutura` | texto/categórica | Responsável pela gestão da infraestrutura |
+| `intervencao_principal` | texto/categórica | Intervenção principal do empreendimento (ex.: "Ampliação de trecho rodoviário", "Operação de dutovia", etc.) |
+| `tipos_infraestruturas` | lista | **Lista** dos tipos de infraestruturas associadas ao empreendimento (pode conter `None`) |
+| `grupo_modelagem` | texto/categórica | Grupo de modelagem (ex.: "Caso geral - infraestruturas lineares", "Conservação rodoviária", etc.) |
 | `capex` | numérico | Investimento de capital declarado (CAPEX), em reais |
 | `opex` | numérico | Custo operacional declarado (OPEX), em reais |
-| `receita_declarada` | numérico | Receita declarada, em reais |
-| `tir_declarada` | numérico | Taxa Interna de Retorno declarada |
-| `rentabilidade` | texto/categórica | Classificação de rentabilidade (ex.: "Alta", "Média", "Baixa") |
+| `receita` | numérico | Receita declarada, em reais |
 | `tirm` | numérico | Taxa Interna de Retorno Modificada |
-| `viabilidade` | texto/categórica | Classificação de viabilidade (ex.: "Viável", "Inviável") |
-| `dimensao_financeira` | numérico | Nota da dimensão financeira |
-| `dimensao_socioeconomica_pond` | numérico | Nota ponderada da dimensão socioeconômica |
-| `dimensao_estrategica` | numérico | Nota da dimensão estratégica |
+| `viabilidade` | texto/categórica | Classificação de viabilidade (ex.: 'Alta viabilidade', 'Média viabilidade', 'Baixa viabilidade', 'Não se aplica) |
 | `ic_1_pond` | numérico | **Nota final ponderada** (composição das 3 dimensões acima) |
 | `Rodovias` | lista | **Lista** de rodovias associadas ao empreendimento (pode conter `None`) |
 | `municipio` | lista | **Lista** de municípios por onde passa o empreendimento (pode conter `None`) |
 | `link_formulario` | string | link do formulário para avaliação do empreendimento |
 | `carteira` | numérico/categórica | 1 = Para empreendimentos que compôe a carteria classificada/prioritária PELT, 0 = Não compõe a carteira
-| regiao_geografica_intermediaria` | lista | **Lista** das regiões geográficas por onde passa o empreendimento. (pode conter `None`) |
+| `regiao_geografica_intermediaria` | lista | **Lista** das regiões geográficas por onde passa o empreendimento. (pode conter `None`) |
+| `extensao_km` | numérico | Extensão do empreendimento em km |
+| `impacto_avaliado_1_pond_cenario` | texto/categórica | Valores: 'Baixo impacto', 'Médio impacto', 'Alto impacto' |
+
 
 ### 2. `df_alocemp` — Demanda presente (2023) e futura por empreendimento
 Contém dados de alocação de demanda de transporte (em toneladas, TKU e veículos) para o cenário presente (2023) e futuro.
@@ -123,12 +125,15 @@ df_completo = pd.merge(df, df_alocemp, on='id_empreendimento', how='inner')
 2. `nome_empreendimento` — o nome completo do empreendimento
 3. `link_formulario` - Link do formulário para avaliação do empreendimento
 
-**Isso é de EXTREMA IMPORTÂNCIA.** Nunca omita essas duas informações. Exemplo de formato:
+**Isso é de EXTREMA IMPORTÂNCIA.** Nunca omita essas duas informações. Exemplo de dados da resposta:
 
 > - **ID 42** — Duplicação da BR-381 entre Belo Horizonte e Governador Valadares - [Avaliar Empreendimento](link_formulario)
 > - **ID 105** — Implantação do Anel Rodoviário Metropolitano de BH - [Avaliar Empreendimento](link_formulario)
 
 Se estiver mostrando uma tabela, as duas primeiras colunas devem ser `id_empreendimento` e `nome_empreendimento`.
+Se possível crie tabelas para apresentar os dados.
+
+Link do formulário é obtido da coluna 'link_formulario'
 
 ---
 

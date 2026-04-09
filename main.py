@@ -24,6 +24,100 @@ st.set_page_config(
     page_icon="🏢",
     layout="wide"
 )
+
+# --- ESTILIZAÇÃO CUSTOMIZADA ---
+st.markdown(
+    """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+    /* Aplicar Montserrat para todo o app */
+    html, body, [class*="st-"], .stApp, h1, h2, h3, p, div, span, button {
+        font-family: 'Montserrat', sans-serif !important;
+    }
+
+    /* Cor dos 'chips' (selecionados) no multiselect */
+    span[data-baseweb="tag"] {
+        background-color: #9BA0BF !important;
+        border-radius: 4px;
+    }
+    
+    /* Cor de fundo dos campos de seleção e inputs */
+    div[data-baseweb="select"] > div, 
+    div[data-baseweb="base-input"],
+    .stTextInput input {
+        background-color: #BAD6D9 !important;
+        color: #1b1b1b !important;
+    }
+
+    /* Garantir que o texto dos selecionados seja visível */
+    span[data-baseweb="tag"] span {
+        color: white !important;
+    }
+
+    /* Estilização das métricas (Visão Geral) */
+    [data-testid="stMetric"] {
+        text-align: center;
+        padding: 15px;
+        background-color: #BAD6D933; /* Fundo suave para os cards */
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    [data-testid="stMetricLabel"] p {
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        color: #192E40 !important;
+        display: flex;
+        justify-content: center;
+        text-align: center !important;
+        width: 100%;
+    }
+    
+    [data-testid="stMetricValue"] {
+        font-size: 2.2rem !important;
+        font-weight: 700 !important;
+        color: #192E40 !important;
+        width: 100%;
+        text-align: center !important;
+        display: flex;
+        justify-content: center;
+    }
+
+    /* Estilo Criativo para o Botão Limpar Filtros */
+    .stButton > button {
+        transition: all 0.3s ease-in-out !important;
+    }
+
+    div[data-testid="column"] button[kind="secondary"] {
+        background: linear-gradient(135deg, #9BA0BF 0%, #192E40 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 30px !important; /* Formato Pílula */
+        padding: 0.5rem 2rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        font-size: 0.8rem !important;
+        box-shadow: 0 4px 15px rgba(25, 46, 64, 0.2) !important;
+    }
+
+    div[data-testid="column"] button[kind="secondary"]:hover {
+        transform: scale(1.05) !important;
+        box-shadow: 0 6px 20px rgba(155, 160, 191, 0.4) !important;
+        opacity: 0.9 !important;
+    }
+
+    div[data-testid="column"] button[kind="secondary"]:active {
+        transform: scale(0.95) !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
   
 ultimo_grafico_base64 = None
 
@@ -322,11 +416,11 @@ with tab_sobre:
     -  **Analisar a demanda de transporte** presente (2023) e suas projeções futuras
     -  **Gerar gráficos** para visualizar tendências e distribuições
     -  **Entender as características** dos empreendimentos e da infraestrutura como um todo
-
+    
     ---
-
-    ###  Visão geral dos empreendimentos
     """)
+
+    st.markdown("<h3 style='text-align: center;'>Visão geral dos empreendimentos</h3>", unsafe_allow_html=True)
 
     # Montar tabela de apresentação a partir do df consolidado
     try:        
@@ -401,29 +495,25 @@ with tab_sobre:
                     else:
                         del st.session_state[chave]
 
-        col_btn_limpar, _ = st.columns([1, 4])
-        with col_btn_limpar:
-            st.button("🗑️ Limpar Filtros", on_click=limpar_filtros, use_container_width=True)
-
         col_filtro1, col_filtro2, col_filtro3 = st.columns(3)
         with col_filtro1:
             if 'Setor' in df_apresentacao.columns:
                 setor_opcoes = sorted(df_apresentacao['Setor'].dropna().unique().tolist())
-                filtro_setor = st.multiselect("Setor", setor_opcoes, key="ms_setor")
+                filtro_setor = st.multiselect("Setor", setor_opcoes, key="ms_setor", placeholder="Escolha os setores...")
             else:
                 filtro_setor = []
         
         with col_filtro2:
             if 'Status' in df_apresentacao.columns:
                 status_opcoes = sorted(df_apresentacao['Status'].dropna().unique().tolist())
-                filtro_status = st.multiselect("Status", status_opcoes, key="ms_status")
+                filtro_status = st.multiselect("Status", status_opcoes, key="ms_status", placeholder="Escolha o status...")
             else:
                 filtro_status = []
         
         with col_filtro3:
             if 'Origem' in df_apresentacao.columns:
                 origem_opcoes = sorted(df_apresentacao['Origem'].dropna().unique().tolist())
-                filtro_origem = st.multiselect("Origem", origem_opcoes, key="ms_origem")
+                filtro_origem = st.multiselect("Origem", origem_opcoes, key="ms_origem", placeholder="Escolha a origem...")
             else:
                 filtro_origem = []
         
@@ -432,21 +522,21 @@ with tab_sobre:
         with col_filtro4:
             if 'Esfera de Ação' in df_apresentacao.columns:
                 esfera_opcoes = sorted(df_apresentacao['Esfera de Ação'].dropna().unique().tolist())
-                filtro_esfera = st.multiselect("Esfera de Ação", esfera_opcoes, key="ms_esfera")
+                filtro_esfera = st.multiselect("Esfera de Ação", esfera_opcoes, key="ms_esfera", placeholder="Escolha a esfera...")
             else:
                 filtro_esfera = []
         
         with col_filtro5:
             if 'Impacto' in df_apresentacao.columns:
                 impacto_opcoes = sorted(df_apresentacao['Impacto'].dropna().unique().tolist())
-                filtro_impacto = st.multiselect("Impacto", impacto_opcoes, key="ms_impacto")
+                filtro_impacto = st.multiselect("Impacto", impacto_opcoes, key="ms_impacto", placeholder="Escolha o impacto...")
             else:
                 filtro_impacto = []
         
         with col_filtro6:
             if 'Viabilidade' in df_apresentacao.columns:
                 viab_opcoes = sorted(df_apresentacao['Viabilidade'].dropna().unique().tolist())
-                filtro_viab = st.multiselect("Viabilidade", viab_opcoes, key="ms_viab")
+                filtro_viab = st.multiselect("Viabilidade", viab_opcoes, key="ms_viab", placeholder="Escolha a viabilidade...")
             else:
                 filtro_viab = []
 
@@ -455,7 +545,7 @@ with tab_sobre:
         with col_pesq1:
             if 'Município' in df_apresentacao.columns:
                 municipios_unicos = sorted(df_apresentacao['Município'].explode().dropna().unique().tolist())
-                filtro_muns = st.multiselect("Pesquisar Município", options=municipios_unicos, help="Comece a digitar para ver as opções...", key="ms_muns")
+                filtro_muns = st.multiselect("Pesquisar Município", options=municipios_unicos, help="Comece a digitar para ver as opções...", key="ms_muns", placeholder="Busque municípios...")
             else:
                 filtro_muns = []
                 
@@ -473,7 +563,7 @@ with tab_sobre:
                     else:
                         rodovias_map[r_str] = r
                 opcoes_rodovias = sorted(list(rodovias_map.keys()))
-                filtro_rods_labels = st.multiselect("Pesquisar Rodovias", options=opcoes_rodovias, help="Ex: digite 'BR-381', 'br381' ou 'br 381'", key="ms_rods")
+                filtro_rods_labels = st.multiselect("Pesquisar Rodovias", options=opcoes_rodovias, help="Ex: digite 'BR-381', 'br381' ou 'br 381'", key="ms_rods", placeholder="Busque rodovias...")
                 filtro_rods = [rodovias_map[lbl] for lbl in filtro_rods_labels]
             else:
                 filtro_rods = []
@@ -481,12 +571,13 @@ with tab_sobre:
         with col_pesq3:
             if 'Região intermediária' in df_apresentacao.columns:
                 regioes_unicas = sorted(df_apresentacao['Região intermediária'].explode().dropna().unique().tolist())
-                filtro_reg = st.multiselect("Pesquisar Região", options=regioes_unicas, help="Comece a digitar para ver as opções...", key="ms_reg")
+                filtro_reg = st.multiselect("Pesquisar Região", options=regioes_unicas, help="Comece a digitar para ver as opções...", key="ms_reg", placeholder="Busque regiões...")
             else:
                 filtro_reg = []
 
-        # Filtros Numéricos
-        col_num1, col_num2, col_num3, col_filtro7 = st.columns(4)
+        # Filtros Numéricos e Adicionais (Organizados em 2 linhas de 3 colunas)
+        col_num1, col_num2, col_num3 = st.columns(3)
+        col_filtro7, _, col_btn_limpar = st.columns(3)
         
         filtro_capex = None
         with col_num1:
@@ -532,9 +623,14 @@ with tab_sobre:
         with col_filtro7:
             if 'Intervenção Principal' in df_apresentacao.columns:
                 int_opcoes = sorted(df_apresentacao['Intervenção Principal'].dropna().unique().tolist())
-                filtro_int = st.multiselect("Intervenção Principal", int_opcoes, key="ms_int")
+                filtro_int = st.multiselect("Intervenção Principal", int_opcoes, key="ms_int", placeholder="Escolha a intervenção...")
             else:
                 filtro_int = []
+
+        with col_btn_limpar:
+            # Espaçador para alinhar o botão com o campo acima
+            st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+            st.button("REINICIAR FILTROS", on_click=limpar_filtros, use_container_width=True)
 
         st.markdown("---")
         if 'Empreendimento' in df_apresentacao.columns:
