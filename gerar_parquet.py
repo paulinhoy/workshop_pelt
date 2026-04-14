@@ -55,7 +55,7 @@ df_region.rename(columns={'regiao_reografica_intermediaria': 'regiao_geografica_
 df_region = df_region.groupby('id_empreendimento')['regiao_geografica_intermediaria'].agg(list).reset_index()
 
 # --- Links do formulário para empreendimento ---
-df_links = pd.read_csv("links_formularios.csv")
+df_links = pd.read_csv("links_formulario.csv")
 
 # --- Municipios por empreendimento ---
 df_municipio = pd.merge(df_extmuni, df_muni, left_on='id_municipio', right_on='int_idmunicipio', how='left')[['id_empreendimento','vhr_municipio']]
@@ -102,7 +102,7 @@ df_consolidado = pd.merge(df_empreendimento_cols, df_impacto_cols, on='id_empree
 df_consolidado = pd.merge(df_consolidado, df_municipio, on='id_empreendimento', how='left')
 
 # Juntar com link para cada empreendimento
-df_consolidado = pd.merge(df_consolidado, df_links, on ='id_empreendimento', how='left')
+df_consolidado = pd.merge(df_consolidado, df_links, on ='id_empreendimento', how='inner')
 
 # Consolidando dados de capex, opex, carteira_classificada, regiões intermediarias e alteracao nomes da colunas
 df_consolidado = pd.merge(df_consolidado, df_economico, on='id_empreendimento',how='left')

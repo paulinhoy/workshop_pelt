@@ -20,9 +20,103 @@ from pathlib import Path
 import os
 
 st.set_page_config(
-    page_title="ChatPELT", 
+    page_title="ChatPELTMG", 
     page_icon="🏢",
     layout="wide"
+)
+
+# --- ESTILIZAÇÃO CUSTOMIZADA ---
+st.markdown(
+    """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+    /* Aplicar Montserrat para todo o app */
+    html, body, [class*="st-"], .stApp, h1, h2, h3, p, div, span, button {
+        font-family: 'Montserrat', sans-serif !important;
+    }
+
+    /* Cor dos 'chips' (selecionados) no multiselect */
+    span[data-baseweb="tag"] {
+        background-color: #9BA0BF !important;
+        border-radius: 4px;
+    }
+    
+    /* Cor de fundo dos campos de seleção e inputs */
+    div[data-baseweb="select"] > div, 
+    div[data-baseweb="base-input"],
+    .stTextInput input {
+        background-color: #BAD6D9 !important;
+        color: #1b1b1b !important;
+    }
+
+    /* Garantir que o texto dos selecionados seja visível */
+    span[data-baseweb="tag"] span {
+        color: white !important;
+    }
+
+    /* Estilização das métricas (Visão Geral) */
+    [data-testid="stMetric"] {
+        text-align: center;
+        padding: 15px;
+        background-color: #BAD6D933; /* Fundo suave para os cards */
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    [data-testid="stMetricLabel"] p {
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        color: #192E40 !important;
+        display: flex;
+        justify-content: center;
+        text-align: center !important;
+        width: 100%;
+    }
+    
+    [data-testid="stMetricValue"] {
+        font-size: 2.2rem !important;
+        font-weight: 700 !important;
+        color: #192E40 !important;
+        width: 100%;
+        text-align: center !important;
+        display: flex;
+        justify-content: center;
+    }
+
+    /* Estilo Criativo para o Botão Limpar Filtros */
+    .stButton > button {
+        transition: all 0.3s ease-in-out !important;
+    }
+
+    div[data-testid="column"] button[kind="secondary"] {
+        background: linear-gradient(135deg, #9BA0BF 0%, #192E40 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 30px !important; /* Formato Pílula */
+        padding: 0.5rem 2rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        font-size: 0.8rem !important;
+        box-shadow: 0 4px 15px rgba(25, 46, 64, 0.2) !important;
+    }
+
+    div[data-testid="column"] button[kind="secondary"]:hover {
+        transform: scale(1.05) !important;
+        box-shadow: 0 6px 20px rgba(155, 160, 191, 0.4) !important;
+        opacity: 0.9 !important;
+    }
+
+    div[data-testid="column"] button[kind="secondary"]:active {
+        transform: scale(0.95) !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
 )
   
 ultimo_grafico_base64 = None
@@ -250,15 +344,18 @@ with st.sidebar:
     <hr style="height:2px;border:none;color:#E6E6FA;background-color:#E6E6FA;" />
     """, unsafe_allow_html=True)
     
-    st.markdown("### Bases de dados")
+    st.markdown("### Bases de Dados")
     st.markdown("""
-    **Dados Consolidados** - Status, viabilidade
-    - CAPEX, OPEX, receita, TIRM
-    - Notas: financeira, socioeconômica, estratégica
-    - Rodovias e municípios associados
+    **Dados Consolidados**
+    - **Projetos:** IDs, nomes, links de avaliação e intervenção principal.
+    - **Contexto:** Setor, esfera de ação, status e origem ajustada.
+    - **Financeiro:** CAPEX, OPEX, receita, TIRM e viabilidade.
+    - **Impacto:** Impacto avaliado e nota ponderada (IC 1 Ponderado).
+    - **Território:** Extensão (km), rodovias, municípios e regiões associadas.
     
-    **Demanda de Transporte** - Toneladas, TKU e veículos
-    - Presente (2023) e projeção futura
+    **Demanda de Transporte**
+    - Fluxos de carga (toneladas e TKU) e tráfego de veículos.
+    - Dados do cenário presente (2023) e projeções futuras (2055).
     """)
     
     st.markdown("""
@@ -285,7 +382,7 @@ with st.sidebar:
 # Área principal
 st.markdown("<h1 style='text-align: center;'>Workshop Comercial</h1>", unsafe_allow_html=True)
 
-tab_sobre, tab_chat = st.tabs(["📋 Sobre o PELT-MG", "💬 ChatPELT"])
+tab_sobre, tab_chat = st.tabs(["📋 Sobre o PELTMG", "💬 ChatPELTMG"])
 
 # --- Funções auxiliares ---
 
@@ -300,33 +397,46 @@ def formatar_escala(valor):
         return f"{valor:.0f}"
 
 
-# --- ABA: SOBRE O PELT-MG ---
+# --- ABA: SOBRE O PELTMG ---
 with tab_sobre:
     st.markdown("""
-    ## Plano Estadual de Logística e Transportes de Minas Gerais (PELT-MG)
+O Workshop Comercial do Plano Estadual de Logística e Transportes de Minas Gerais (PELTMG) busca captar a atratividade mercadológica dos empreendimentos e sua aderência à estratégia de investimentos de cada setor ou organização.
 
-    O **PELT-MG** é um instrumento de planejamento estratégico do Governo do Estado de Minas Gerais 
-    que reúne estudos e análises sobre os **empreendimentos de infraestrutura de transportes** em todo o território mineiro.
+O objetivo desta etapa é permitir que você avalie os empreendimentos de interesse para a sua instituição. Dada a vasta carteira do PELTMG, esta plataforma foi desenvolvida para otimizar a sua navegação e análise.
 
-    O plano abrange diversos modais — rodoviário, ferroviário, dutoviário, aeroviário e hidroviário — 
-    e avalia cada empreendimento sob múltiplas dimensões: **viabilidade financeira, impacto socioeconômico, 
-    demanda de transporte presente e futura, e relevância estratégica** para o desenvolvimento do estado.
+### Métodos de Busca
 
-    ###  Sobre este ChatBot
+Existem duas formas principais de localizar os empreendimentos para avaliação:
 
-    O **ChatPELT** foi construído para facilitar a consulta e o entendimento da base de dados do PELT-MG.  
-    Com ele, você pode:
+#### 1. Visão Geral
+Nesta seção, você pode filtrar os projetos utilizando parâmetros técnicos e geográficos já definidos:
+* **Critérios:** Setor, Status, Origem, Esfera de Ação, Impacto, Viabilidade, Município, Rodovias, Regiões, CAPEX, OPEX, Nota Ponderada e Intervenção Principal.
 
-    -  **Consultar empreendimentos** por viabilidade, status, fonte de financiamento, setor e outros critérios
-    -  **Comparar dados financeiros** como CAPEX, OPEX, receita e TIR declarados
-    -  **Analisar a demanda de transporte** presente (2023) e suas projeções futuras
-    -  **Gerar gráficos** para visualizar tendências e distribuições
-    -  **Entender as características** dos empreendimentos e da infraestrutura como um todo
+#### 2. ChatPELTMG (Assistente Inteligente)
+Uma ferramenta interativa que permite:
+* **Consultar empreendimentos** por viabilidade, status, fonte de financiamento e setor.
+* **Comparar dados financeiros**, como CAPEX, OPEX, receita e Taxa Interna de Retorno (TIR).
+* **Analisar a demanda de transporte** atual (2023) e suas projeções futuras (2055).
+* **Compreender as características** gerais da infraestrutura e dos projetos.
 
-    ---
+---
 
-    ###  Visão geral dos empreendimentos
+### Como Realizar a sua Avaliação
+
+1.  Após localizar o empreendimento desejado, clique no botão **"Avaliar"**. Você será direcionado ao formulário de avaliação específico.
+2.  Caso deseje avaliar múltiplos empreendimentos, retorne a esta página inicial, localize o próximo projeto e clique novamente em **"Avaliar"**.
+
+### Informações Adicionais
+
+Para acessar o relatório completo e o painel de resultados do PELTMG, visite nossa página oficial:
+[Consulta Pública - Plano Estadual de Logística e Transporte](https://codemge.com.br/consulta-publica-plano-estadual-de-logistica-e-transporte/)
+
+**Prazo para envio das avaliações:** até o dia **XX/XX/XXXX**.
+
+Em caso de dúvidas, entre em contato com nossa equipe técnica pelo e-mail: **peltmg@codemge.com.br**.
     """)
+
+    st.markdown("<h3 style='text-align: center;'>Visão geral dos empreendimentos</h3>", unsafe_allow_html=True)
 
     # Montar tabela de apresentação a partir do df consolidado
     try:        
@@ -368,13 +478,13 @@ with tab_sobre:
         # Métricas resumo
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Total de empreendimentos", f"{len(df_apresentacao):,}".replace(",", "."))
+            st.metric("Empreendimentos", f"{len(df_apresentacao):,}".replace(",", "."))
         with col2:
-            if 'Status' in df_apresentacao.columns:
-                em_execucao = df_apresentacao['Status'].astype(str).str.contains('execução', case=False, na=False).sum()
+            if 'Impacto' in df_apresentacao.columns:
+                alto_impacto = df_apresentacao['Impacto'].astype(str).str.contains('Alto', case=False, na=False).sum()
             else:
-                em_execucao = 0
-            st.metric("Em execução", f"{em_execucao:,}".replace(",", "."))
+                alto_impacto = 0
+            st.metric("Alto impacto", f"{alto_impacto:,}".replace(",", "."))
         with col3:
             if 'Viabilidade' in df_apresentacao.columns:
                 alta_viab = df_apresentacao['Viabilidade'].astype(str).str.contains('Alta', case=False, na=False).sum()
@@ -388,25 +498,38 @@ with tab_sobre:
         st.markdown("---")
 
         # Filtros Categóricos
+        def limpar_filtros():
+            chaves = [
+                'ms_setor', 'ms_status', 'ms_origem', 'ms_esfera', 'ms_impacto', 
+                'ms_viab', 'ms_muns', 'ms_rods', 'ms_reg', 'sl_capex', 'sl_opex', 
+                'sl_nota', 'ms_int', 'ms_natureza', 'ms_nome'
+            ]
+            for chave in chaves:
+                if chave in st.session_state:
+                    if chave.startswith('ms_'):
+                        st.session_state[chave] = []
+                    else:
+                        del st.session_state[chave]
+
         col_filtro1, col_filtro2, col_filtro3 = st.columns(3)
         with col_filtro1:
             if 'Setor' in df_apresentacao.columns:
                 setor_opcoes = sorted(df_apresentacao['Setor'].dropna().unique().tolist())
-                filtro_setor = st.multiselect("Setor", setor_opcoes)
+                filtro_setor = st.multiselect("Setor", setor_opcoes, key="ms_setor", placeholder="Escolha os setores...")
             else:
                 filtro_setor = []
         
         with col_filtro2:
             if 'Status' in df_apresentacao.columns:
                 status_opcoes = sorted(df_apresentacao['Status'].dropna().unique().tolist())
-                filtro_status = st.multiselect("Status", status_opcoes)
+                filtro_status = st.multiselect("Status", status_opcoes, key="ms_status", placeholder="Escolha o status...")
             else:
                 filtro_status = []
         
         with col_filtro3:
             if 'Origem' in df_apresentacao.columns:
                 origem_opcoes = sorted(df_apresentacao['Origem'].dropna().unique().tolist())
-                filtro_origem = st.multiselect("Origem", origem_opcoes)
+                filtro_origem = st.multiselect("Origem", origem_opcoes, key="ms_origem", placeholder="Escolha a origem...")
             else:
                 filtro_origem = []
         
@@ -415,21 +538,21 @@ with tab_sobre:
         with col_filtro4:
             if 'Esfera de Ação' in df_apresentacao.columns:
                 esfera_opcoes = sorted(df_apresentacao['Esfera de Ação'].dropna().unique().tolist())
-                filtro_esfera = st.multiselect("Esfera de Ação", esfera_opcoes)
+                filtro_esfera = st.multiselect("Esfera de Ação", esfera_opcoes, key="ms_esfera", placeholder="Escolha a esfera...")
             else:
                 filtro_esfera = []
         
         with col_filtro5:
             if 'Impacto' in df_apresentacao.columns:
                 impacto_opcoes = sorted(df_apresentacao['Impacto'].dropna().unique().tolist())
-                filtro_impacto = st.multiselect("Impacto", impacto_opcoes)
+                filtro_impacto = st.multiselect("Impacto", impacto_opcoes, key="ms_impacto", placeholder="Escolha o impacto...")
             else:
-                filtro_esfera = []
+                filtro_impacto = []
         
         with col_filtro6:
             if 'Viabilidade' in df_apresentacao.columns:
                 viab_opcoes = sorted(df_apresentacao['Viabilidade'].dropna().unique().tolist())
-                filtro_viab = st.multiselect("Viabilidade", viab_opcoes)
+                filtro_viab = st.multiselect("Viabilidade", viab_opcoes, key="ms_viab", placeholder="Escolha a viabilidade...")
             else:
                 filtro_viab = []
 
@@ -438,7 +561,7 @@ with tab_sobre:
         with col_pesq1:
             if 'Município' in df_apresentacao.columns:
                 municipios_unicos = sorted(df_apresentacao['Município'].explode().dropna().unique().tolist())
-                filtro_muns = st.multiselect("Pesquisar Município", options=municipios_unicos, help="Comece a digitar para ver as opções...")
+                filtro_muns = st.multiselect("Pesquisar Município", options=municipios_unicos, help="Comece a digitar para ver as opções...", key="ms_muns", placeholder="Busque municípios...")
             else:
                 filtro_muns = []
                 
@@ -456,20 +579,21 @@ with tab_sobre:
                     else:
                         rodovias_map[r_str] = r
                 opcoes_rodovias = sorted(list(rodovias_map.keys()))
-                filtro_rods_labels = st.multiselect("Pesquisar Rodovias", options=opcoes_rodovias, help="Ex: digite 'BR-381', 'br381' ou 'br 381'")
+                filtro_rods_labels = st.multiselect("Pesquisar Rodovias", options=opcoes_rodovias, help="Ex: digite 'BR-381', 'br381' ou 'br 381'", key="ms_rods", placeholder="Busque rodovias...")
                 filtro_rods = [rodovias_map[lbl] for lbl in filtro_rods_labels]
             else:
                 filtro_rods = []
     
-            with col_pesq3:
-                if 'Região intermediária' in df_apresentacao.columns:
-                    municipios_unicos = sorted(df_apresentacao['Região intermediária'].explode().dropna().unique().tolist())
-                    filtro_reg = st.multiselect("Pesquisar Região", options=municipios_unicos, help="Comece a digitar para ver as opções...")
-                else:
-                    filtro_reg = []
+        with col_pesq3:
+            if 'Região intermediária' in df_apresentacao.columns:
+                regioes_unicas = sorted(df_apresentacao['Região intermediária'].explode().dropna().unique().tolist())
+                filtro_reg = st.multiselect("Pesquisar Região", options=regioes_unicas, help="Comece a digitar para ver as opções...", key="ms_reg", placeholder="Busque regiões...")
+            else:
+                filtro_reg = []
 
-        # Filtros Numéricos
-        col_num1, col_num2, col_num3, col_filtro7 = st.columns(4)
+        # Filtros Numéricos e Adicionais
+        col_num1, col_num2, col_num3 = st.columns(3)
+        col_filtro7, col_filtro8, col_btn_limpar = st.columns(3)
         
         filtro_capex = None
         with col_num1:
@@ -478,14 +602,13 @@ with tab_sobre:
                 max_capex = float(df_apresentacao['CAPEX (R$)'].max())
                 
                 if min_capex < max_capex:
-                    # Cria 100 "paradas" entre o valor mínimo e máximo
                     opcoes_capex = np.linspace(min_capex, max_capex, 200)
-                    
                     filtro_capex = st.select_slider(
                         "CAPEX (R$)",
                         options=opcoes_capex,
                         value=(opcoes_capex[0], opcoes_capex[-1]),
-                        format_func=formatar_escala 
+                        format_func=formatar_escala,
+                        key="sl_capex"
                     )
                     
         filtro_opex = None
@@ -495,12 +618,12 @@ with tab_sobre:
                 max_opex = float(df_apresentacao['OPEX (R$)'].max())
                 if min_opex < max_opex:
                     opcoes_opex = np.linspace(min_opex, max_opex, 100)
-
                     filtro_opex = st.select_slider(
                         "OPEX (R$)",
                         options=opcoes_opex,
                         value=(opcoes_opex[0],opcoes_opex[-1]),
-                        format_func=formatar_escala)
+                        format_func=formatar_escala,
+                        key="sl_opex")
 
         filtro_nota = None
         with col_num3:
@@ -508,63 +631,77 @@ with tab_sobre:
                 min_nota = float(df_apresentacao['Nota Ponderada'].min())
                 max_nota = float(df_apresentacao['Nota Ponderada'].max())
                 if min_nota < max_nota:
-                    filtro_nota = st.slider("Nota Ponderada", min_value=min_nota, max_value=max_nota, value=(min_nota, max_nota), format="%.2f")
+                    filtro_nota = st.slider("Nota Ponderada", min_value=min_nota, max_value=max_nota, value=(min_nota, max_nota), format="%.2f", key="sl_nota")
 
         with col_filtro7:
             if 'Intervenção Principal' in df_apresentacao.columns:
                 int_opcoes = sorted(df_apresentacao['Intervenção Principal'].dropna().unique().tolist())
-                filtro_int = st.multiselect("Intervenção Principal", int_opcoes)
+                filtro_int = st.multiselect("Intervenção Principal", int_opcoes, key="ms_int", placeholder="Escolha a intervenção...")
             else:
                 filtro_int = []
 
+        with col_filtro8:
+            if 'Natureza' in df_apresentacao.columns:
+                natureza_opcoes = sorted(df_apresentacao['Natureza'].dropna().unique().tolist())
+                filtro_natureza = st.multiselect("Natureza", natureza_opcoes, key="ms_natureza", placeholder="Escolha a natureza...")
+            else:
+                filtro_natureza = []
+
+        with col_btn_limpar:
+            st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+            st.button("REINICIAR FILTROS", on_click=limpar_filtros, use_container_width=True)
+
         st.markdown("---")
-        filtro_texto_nome = st.text_input(
+        if 'Empreendimento' in df_apresentacao.columns:
+            opcoes_empreendimentos = sorted(df_apresentacao['Empreendimento'].dropna().unique().tolist())
+        else:
+            opcoes_empreendimentos = []
+
+        filtro_texto_nome = st.multiselect(
             "Pesquisar por Nome do Empreendimento", 
-            placeholder="Digite parte do nome para buscar..."
+            options=opcoes_empreendimentos,
+            placeholder="Digite parte do nome para buscar...",
+            key="ms_nome"
         )
 
-        # Aplicação dos Filtros
         df_filtrado = df_apresentacao.copy()
 
-        # Filtros Categóricos 
         if filtro_viab and 'Viabilidade' in df_filtrado.columns:
             df_filtrado = df_filtrado[df_filtrado['Viabilidade'].isin(filtro_viab)]
-            
         if filtro_status and 'Status' in df_filtrado.columns:
             df_filtrado = df_filtrado[df_filtrado['Status'].isin(filtro_status)]
-            
         if filtro_origem and 'Origem' in df_filtrado.columns:
-            df_filtrado = df_filtrado[df_filtrado['Natureza'].isin(filtro_origem)]
-            
+            df_filtrado = df_filtrado[df_filtrado['Origem'].isin(filtro_origem)]
         if filtro_setor and 'Setor' in df_filtrado.columns:
             df_filtrado = df_filtrado[df_filtrado['Setor'].isin(filtro_setor)]
-            
         if filtro_esfera and 'Esfera de Ação' in df_filtrado.columns:
             df_filtrado = df_filtrado[df_filtrado['Esfera de Ação'].isin(filtro_esfera)]
-            
         if filtro_impacto and 'Impacto' in df_filtrado.columns:
-            df_filtrado = df_filtrado[df_filtrado['Responsável Gestão'].isin(filtro_impacto)]
-            
+            df_filtrado = df_filtrado[df_filtrado['Impacto'].isin(filtro_impacto)]
+        if filtro_int and 'Intervenção Principal' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['Intervenção Principal'].isin(filtro_int)]
+        if filtro_natureza and 'Natureza' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['Natureza'].isin(filtro_natureza)]
         if filtro_muns and 'Município' in df_filtrado.columns:
             def has_mun(val):
                 if isinstance(val, (list, np.ndarray)):
                     return any(m in val for m in filtro_muns)
                 return val in filtro_muns
             df_filtrado = df_filtrado[df_filtrado['Município'].apply(has_mun)]
-            
         if filtro_rods and 'Rodovias' in df_filtrado.columns:
             def has_rod(val):
                 if isinstance(val, (list, np.ndarray)):
                     return any(r in val for r in filtro_rods)
                 return val in filtro_rods
             df_filtrado = df_filtrado[df_filtrado['Rodovias'].apply(has_rod)]
-            
         if filtro_capex:
             df_filtrado = df_filtrado[df_filtrado['CAPEX (R$)'].isna() | df_filtrado['CAPEX (R$)'].between(filtro_capex[0], filtro_capex[1])]
         if filtro_opex:
             df_filtrado = df_filtrado[df_filtrado['OPEX (R$)'].isna() | df_filtrado['OPEX (R$)'].between(filtro_opex[0], filtro_opex[1])]
         if filtro_nota:
             df_filtrado = df_filtrado[df_filtrado['Nota Ponderada'].isna() | df_filtrado['Nota Ponderada'].between(filtro_nota[0], filtro_nota[1])]
+        if filtro_texto_nome and 'Empreendimento' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['Empreendimento'].isin(filtro_texto_nome)]
         
         st.markdown(f"**Exibindo {len(df_filtrado)} empreendimentos**")
         #st.dataframe(df_filtrado, use_container_width=True, height=500, hide_index=True)
