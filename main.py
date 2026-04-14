@@ -350,7 +350,7 @@ with st.sidebar:
     - **Projetos:** IDs, nomes, links de avaliação e intervenção principal.
     - **Contexto:** Setor, esfera de ação, status e origem ajustada.
     - **Financeiro:** CAPEX, OPEX, receita, TIRM e viabilidade.
-    - **Impacto:** Impacto avaliado e nota ponderada (IC 1 Ponderado).
+    - **Impacto:** Impacto avaliado e índice de classificação.
     - **Território:** Extensão (km), rodovias, municípios e regiões associadas.
     
     **Demanda de Transporte**
@@ -410,7 +410,7 @@ Existem duas formas principais de localizar os empreendimentos para avaliação:
 
 #### 1. Visão Geral
 Nesta seção, você pode filtrar os projetos utilizando parâmetros técnicos e geográficos já definidos:
-* **Critérios:** Setor, Status, Origem, Esfera de Ação, Impacto, Viabilidade, Município, Rodovias, Regiões, CAPEX, OPEX, Nota Ponderada e Intervenção Principal.
+* **Critérios:** Setor, Status, Origem, Esfera de Ação, Impacto, Viabilidade, Município, Rodovias, Regiões, CAPEX, OPEX, Índice de Classificação e Intervenção Principal.
 
 #### 2. ChatPELTMG (Assistente Inteligente)
 Uma ferramenta interativa que permite:
@@ -431,7 +431,7 @@ Uma ferramenta interativa que permite:
 Para acessar o relatório completo e o painel de resultados do PELTMG, visite nossa página oficial:
 [Consulta Pública - Plano Estadual de Logística e Transporte](https://codemge.com.br/consulta-publica-plano-estadual-de-logistica-e-transporte/)
 
-**Prazo para envio das avaliações:** até o dia **XX/XX/XXXX**.
+**Prazo para envio das avaliações:** até o dia **24/04/2026**.
 
 Em caso de dúvidas, entre em contato com nossa equipe técnica pelo e-mail: **peltmg@codemge.com.br**.
     """)
@@ -466,7 +466,7 @@ Em caso de dúvidas, entre em contato com nossa equipe técnica pelo e-mail: **p
             'tirm': 'TIRM',
             'capex': 'CAPEX (R$)',
             'opex': 'OPEX (R$)',
-            'ic_1_pond': 'Nota Ponderada',
+            'ic_1_pond': 'Índice Classificação',
             'municipio': 'Município',
             'Rodovias': 'Rodovias',
             'esfera_acao': 'Esfera de Ação',
@@ -627,11 +627,11 @@ Em caso de dúvidas, entre em contato com nossa equipe técnica pelo e-mail: **p
 
         filtro_nota = None
         with col_num3:
-            if 'Nota Ponderada' in df_apresentacao.columns and not df_apresentacao['Nota Ponderada'].isna().all():
-                min_nota = float(df_apresentacao['Nota Ponderada'].min())
-                max_nota = float(df_apresentacao['Nota Ponderada'].max())
+            if 'Índice Classificação' in df_apresentacao.columns and not df_apresentacao['Índice Classificação'].isna().all():
+                min_nota = float(df_apresentacao['Índice Classificação'].min())
+                max_nota = float(df_apresentacao['Índice Classificação'].max())
                 if min_nota < max_nota:
-                    filtro_nota = st.slider("Nota Ponderada", min_value=min_nota, max_value=max_nota, value=(min_nota, max_nota), format="%.2f", key="sl_nota")
+                    filtro_nota = st.slider("Índice Classificação", min_value=min_nota, max_value=max_nota, value=(min_nota, max_nota), format="%.2f", key="sl_nota")
 
         with col_filtro7:
             if 'Intervenção Principal' in df_apresentacao.columns:
@@ -694,12 +694,18 @@ Em caso de dúvidas, entre em contato com nossa equipe técnica pelo e-mail: **p
                     return any(r in val for r in filtro_rods)
                 return val in filtro_rods
             df_filtrado = df_filtrado[df_filtrado['Rodovias'].apply(has_rod)]
+        if filtro_reg and 'Região intermediária' in df_filtrado.columns:
+            def has_reg(val):
+                if isinstance(val, (list,np.ndarray)):
+                    return any(m in val for m in filtro_reg)
+                return val in filtro_reg
+            df_filtrado = df_filtrado[df_filtrado['Região intermediária'].apply(has_reg)]
         if filtro_capex:
             df_filtrado = df_filtrado[df_filtrado['CAPEX (R$)'].isna() | df_filtrado['CAPEX (R$)'].between(filtro_capex[0], filtro_capex[1])]
         if filtro_opex:
             df_filtrado = df_filtrado[df_filtrado['OPEX (R$)'].isna() | df_filtrado['OPEX (R$)'].between(filtro_opex[0], filtro_opex[1])]
         if filtro_nota:
-            df_filtrado = df_filtrado[df_filtrado['Nota Ponderada'].isna() | df_filtrado['Nota Ponderada'].between(filtro_nota[0], filtro_nota[1])]
+            df_filtrado = df_filtrado[df_filtrado['Índice Classificação'].isna() | df_filtrado['Índice Classificação'].between(filtro_nota[0], filtro_nota[1])]
         if filtro_texto_nome and 'Empreendimento' in df_filtrado.columns:
             df_filtrado = df_filtrado[df_filtrado['Empreendimento'].isin(filtro_texto_nome)]
         

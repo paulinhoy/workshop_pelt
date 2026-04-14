@@ -6,6 +6,15 @@ import numpy as np
 df_empreendimento = pd.read_json("dadospelt/vw_empreendimento.json")
 df_empreendimento = pd.json_normalize(df_empreendimento['vw_empreendimento'])
 
+# Empreendimento id=1994
+df1994 = pd.read_json('dadospelt/mvw_atlas_comercial_emp1994.json')
+df1994 = pd.json_normalize(df1994['mvw_atlas_comercial_emp1994'])
+df_emp1994 = df1994[['id_empreendimento', 'origem_ajustada', 'nome_empreendimento', 'setor',
+                    'descr_status_empreendimento', 'natureza_empreendimento', 'esfera_acao',
+                    'grupo_modelagem', 'responsavel_gestao_infraestrutura', 'tirm',
+                    'viabilidade', 'ic_1_pond', 'CAPEX', 'OPEX', 'receita']]
+df_emp1994.rename(columns={'CAPEX': 'capex', 'OPEX': 'opex'},inplace=True)
+
 df_impacto = pd.read_json("dadospelt/mvw_4_calcula_impacto_1_pond_cenario.json")
 df_impacto = pd.json_normalize(df_impacto['mvw_4_calcula_impacto_1_pond_cenario'])
 
@@ -96,6 +105,7 @@ df_impacto_cols = df_impacto[['id_empreendimento', 'setor','descr_status_empreen
                                'tirm', 'viabilidade', 'dimensao_financeira',
                                'dimensao_socioeconomica_pond', 'dimensao_estrategica', 'ic_1_pond']]
 
+
 df_consolidado = pd.merge(df_empreendimento_cols, df_impacto_cols, on='id_empreendimento', how='inner')
 
 # Juntar com municipios e rodovias
@@ -113,6 +123,9 @@ df_consolidado = pd.merge(df_consolidado, df_region, on='id_empreendimento', how
 df_consolidado= pd.merge(df_consolidado, df_extensao, on='id_empreendimento', how='left')
 df_consolidado=pd.merge(df_consolidado, df_gestao_carteiras, on='id_empreendimento', how='left')
 df_consolidado['tipos_infraestruturas'] = df_consolidado['tipos_infraestruturas'].apply(converter_para_lista)
+
+#Adicionando empreendimento id=1994
+df_consolidado = pd.concat([df_consolidado, df_emp1994], ignore_index=True)
 
 # Verificação
 nulos_nome = df_consolidado['nome_empreendimento'].isna().sum()

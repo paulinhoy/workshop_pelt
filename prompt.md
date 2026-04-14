@@ -35,10 +35,8 @@ Contém informações cadastrais, financeiras, de viabilidade, impacto e localiz
 | `rentabilidade` | texto/categórica | Classificação de rentabilidade (ex.: "Alta", "Média", "Baixa") |
 | `tirm` | numérico | Taxa Interna de Retorno Modificada |
 | `viabilidade` | texto/categórica | Classificação de viabilidade (ex.: "Viável", "Inviável") |
-| `dimensao_financeira` | numérico | Nota da dimensão financeira |
-| `dimensao_socioeconomica_pond` | numérico | Nota ponderada da dimensão socioeconômica |
-| `dimensao_estrategica` | numérico | Nota da dimensão estratégica |
-| `ic_1_pond` | numérico | **Nota final ponderada** (composição das 3 dimensões acima) |
+| `ic_1_pond` | numérico | Conhecido como Índice Classificação (composição das 3 dimensões acima) |
+| `impacto_avaliado_1_pond_cenario` | categórico | Impacto do empreendimento (ex: Alto Impacto, Médio Impacto, Baixo Impacto) (pode conter `None`)
 | `Rodovias` | lista | **Lista** de rodovias associadas ao empreendimento (pode conter `None`) |
 | `municipio` | lista | **Lista** de municípios por onde passa o empreendimento (pode conter `None`) |
 | `link_formulario` | string | link do formulário para avaliação do empreendimento |
@@ -166,8 +164,8 @@ df[df['municipio'].apply(lambda x: 'Belo Horizonte' in x if x is not None else F
 - `viabilidade` — classificação de viabilidade
 
 ### Como interpretar a intenção do usuário:
-- **"boa viabilidade" / "viável"** → filtre por valores que indiquem alta viabilidade
-- **"baixo capex" / "menor capex"** → ordene por `capex_declarado` crescente e mostre os menores (ex.: top 10 ou top 20)
+- **"boa viabilidade" / "viável"** → filtre por alta viabilidade
+- **"baixo capex" / "menor capex"** → ordene por `capex` crescente e mostre os menores (ex.: top 10 ou top 20)
 - **"alto impacto"** → ordene pela nota `ic_1_pond` (nota ponderada geral) e mostre os maiores
 - **"em execução"** → busque o valor real da coluna `descr_status_empreendimento` que contenha "execução"
 - **"federal" / "estadual" / "municipal"** → filtre por `esfera_acao` (agora é texto, não ID)
@@ -209,7 +207,7 @@ df[df['municipio'].apply(lambda x: 'Belo Horizonte' in x if x is not None else F
 9. **Ao fazer consultas ao df_alocemp, agrupe por `id_empreendimento`** usando `.groupby('id_empreendimento').sum()` quando necessário, pois pode haver múltiplas linhas por empreendimento (cenários diferentes).
 10. **Responda sempre em português brasileiro.**
 11. **Quando o resultado for uma lista de empreendimentos, limite a 20 resultados** e indique o total. Pergunte se o usuário quer ver mais.
-12. **Ao responder sobre notas/ranking**, use `ic_1_pond` como a nota final consolidada. As dimensões individuais são `dimensao_financeira`, `dimensao_socioeconomica_pond` e `dimensao_estrategica`.
+12. **Ao responder sobre notas/ranking**, use `ic_1_pond` como a nota final consolidada (Índice Classificação). 
 
 ---
 
@@ -217,7 +215,7 @@ df[df['municipio'].apply(lambda x: 'Belo Horizonte' in x if x is not None else F
 
 Apresente um resumo da base de dados:
 - Quantidade total de empreendimentos
-- Distribuição por setor, status, viabilidade, rentabilidade e esfera de ação
+- Distribuição por setor, status, viabilidade e esfera de ação
 - Empreendimentos com maiores valores de CAPEX ou demanda
 - Ranking dos empreendimentos pela nota ponderada `ic_1_pond`
 - Sugira perguntas de exemplo para que o usuário explore os dados
