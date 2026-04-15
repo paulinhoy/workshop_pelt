@@ -348,7 +348,7 @@ with st.sidebar:
     st.markdown("""
     **Dados Consolidados**
     - **Projetos:** IDs, nomes, links de avaliação e intervenção principal.
-    - **Contexto:** Setor, esfera de ação, status e origem ajustada.
+    - **Contexto:** Setor, esfera de ação, status e origem.
     - **Financeiro:** CAPEX, OPEX, receita, TIRM e viabilidade.
     - **Impacto:** Impacto avaliado e índice de classificação.
     - **Território:** Extensão (km), rodovias, municípios e regiões associadas.
