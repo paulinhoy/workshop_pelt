@@ -20,7 +20,7 @@ Dados disponíveis e descrição
 | Coluna | Tipo | Descrição |
 |---|---|---|
 | `id_empreendimento` | numérico | Identificador único do empreendimento.(chave de junção) |
-| `nome_empreendimento` | texto | Nome do empreendimento. Também chamado de concessão, projeto etc. |
+| `nome_empreendimento` | texto | Nome do empreendimento. Também chamado de concessão, projeto, lote, etc. |
 | `setor` | texto/categórica | Setor do empreendimento (ex.: "Rodoviário", "Ferroviário", "Aeroviário", etc.) |
 | `origem_ajustada` | texto/categórica | Origem dos dados do empreendimento (ex: PELT 2007, DNIT, ANTT) |
 | `tipos_infraestruturas` | lista | **Lista** dos tipos de obras de infraestrutura que são realizadas dentro do empreendimento |

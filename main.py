@@ -18,6 +18,9 @@ from langchain_community.callbacks import get_openai_callback
 from dotenv import load_dotenv  
 from pathlib import Path  
 import os
+import json
+import uuid
+import csv
 
 st.set_page_config(
     page_title="ChatPELTMG", 
@@ -255,6 +258,41 @@ prompt = ChatPromptTemplate.from_messages([
     MessagesPlaceholder(variable_name="agent_scratchpad")  
 ])
 
+# Identificador de seção (chave única)
+if "session_id" not in st.session_state:
+    st.session_state.session_id = str(uuid.uuid4())
+
+def salvar_log(pergunta, resposta, execucao):
+    log_file = "chatbot_logs.csv"
+    file_exists = os.path.isfile(log_file)
+    
+    timestamp = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    
+    # Formata a execução (intermediate steps) para JSON string
+    execucao_formatada = []
+    if execucao:
+        for action, observation in execucao:
+            execucao_formatada.append({
+                "tool": action.tool,
+                "tool_input": action.tool_input,
+                "log": action.log,
+                "observation": str(observation)
+            })
+    
+    log_data = {
+        "timestamp": timestamp,
+        "session_id": st.session_state.session_id,
+        "pergunta": pergunta,
+        "resposta": resposta,
+        "execucao": json.dumps(execucao_formatada, ensure_ascii=False)
+    }
+    
+    with open(log_file, "a", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=log_data.keys())
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow(log_data)
+
 # Isolar o agente e a memória no session_state para não vazar dados entre usuários
 def inicializar_agente():
     if "agent_executor" not in st.session_state:
@@ -304,11 +342,16 @@ def processar_pergunta(pergunta: str, chat_history: list = None) -> str:
         if ultimo_grafico_base64:  
             resposta_para_usuario += f"\\nGRAFICO_BASE64:{ultimo_grafico_base64}"  
             ultimo_grafico_base64 = None
+        
+        # Salva o log da interação
+        salvar_log(pergunta, resposta_para_usuario, resposta_agente.get("intermediate_steps"))
   
     except Exception as e:  
         ultimo_grafico_base64 = None
         resposta_para_usuario = "Ocorreu um erro ao processar sua solicitação."  
-        print(f"ERRO NO AGENTE: {e}")   
+        print(f"ERRO NO AGENTE: {e}")
+        # Salva o erro no log também
+        salvar_log(pergunta, f"ERRO: {str(e)}", [])
   
     return resposta_para_usuario  
 
