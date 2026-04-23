@@ -111,8 +111,6 @@ df_consolidado = pd.merge(df_empreendimento_cols, df_impacto_cols, on='id_empree
 # Juntar com municipios e rodovias
 df_consolidado = pd.merge(df_consolidado, df_municipio, on='id_empreendimento', how='left')
 
-# Juntar com link para cada empreendimento
-df_consolidado = pd.merge(df_consolidado, df_links, on ='id_empreendimento', how='inner')
 
 # Consolidando dados de capex, opex, carteira_classificada, regiões intermediarias e alteracao nomes da colunas
 df_consolidado = pd.merge(df_consolidado, df_economico, on='id_empreendimento',how='left')
@@ -127,6 +125,9 @@ df_consolidado['tipos_infraestruturas'] = df_consolidado['tipos_infraestruturas'
 #Adicionando empreendimento id=1994
 df_consolidado = pd.concat([df_consolidado, df_emp1994], ignore_index=True)
 
+# Juntar com link para cada empreendimento
+df_consolidado = pd.merge(df_consolidado, df_links, on ='id_empreendimento', how='inner')
+
 # Verificação
 nulos_nome = df_consolidado['nome_empreendimento'].isna().sum()
 total = len(df_consolidado)
@@ -136,4 +137,6 @@ print(f"Colunas: {list(df_consolidado.columns)}")
 
 # Salvar
 df_consolidado.to_parquet('dados_consolidados.parquet')
+df_consolidado.to_csv('dados_consolidados.csv')
+
 print("\nArquivo dados_consolidados.parquet salvo com sucesso!")
